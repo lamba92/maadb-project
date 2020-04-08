@@ -41,31 +41,27 @@ fun Application.sqlAnalyticServer() {
     install(Locations)
 
     routing {
-
         route("statistics") {
-
             route("tweets") {
-
                 get<EmotionLocation> { param ->
                     val wordsCounted = newSuspendedTransaction(db = db) {
                         TweetEntity.find { TweetsTable.sentiment eq param.emotion.toString() }
                             .map { it.stemmedTweetWithOccurrences }
                             .merge()
                     }
-                    val newWords =
-                        wordsCounted.keys.filter { it !in Resources.LexicalData.Emotions.Specific.getValue(param.emotion) }
+                    val newWords = wordsCounted.keys.filter {
+                        it !in Resources.LexicalData.Emotions.Specific.getValue(param.emotion)
+                    }
                     call.respond(
                         TweetsStatisticsResult(
+                            param.emotion,
                             wordsCounted,
                             newWords
                         )
                     )
                 }
-
             }
-
             route("hashtags") {
-
                 get<EmotionLocation> { param ->
                     val hashtagsCounted = newSuspendedTransaction {
                         TweetEntity.find { TweetsTable.sentiment eq param.emotion.toString() }
@@ -80,8 +76,6 @@ fun Application.sqlAnalyticServer() {
                     )
                 }
             }
-
         }
-
     }
 }

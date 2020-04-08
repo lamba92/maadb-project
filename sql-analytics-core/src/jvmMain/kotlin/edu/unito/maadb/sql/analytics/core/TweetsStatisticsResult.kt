@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TweetsStatisticsResult(
+    val sentiment: Sentiment,
     val wordsWithOccurrences: Map<String, Int>,
     val newWordsNotInResources: List<String>
 )

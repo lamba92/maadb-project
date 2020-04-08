@@ -8,7 +8,14 @@ import edu.unito.maadb.sql.daos.TweetEmojiEntity
 import edu.unito.maadb.sql.daos.TweetEmoticonEntity
 import edu.unito.maadb.sql.daos.TweetEntity
 import edu.unito.maadb.sql.daos.TweetHashtagEntity
+import edu.unito.maadb.sql.tables.TweetEmojisTable
+import edu.unito.maadb.sql.tables.TweetEmoticonsTable
+import edu.unito.maadb.sql.tables.TweetHashtagsTable
+import edu.unito.maadb.sql.tables.TweetsTable
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 fun ElaboratedTweet.toEntity(): TweetEntity {
@@ -59,24 +66,33 @@ fun TweetEntity.toModel() =
         emoticons.associate { it.emoticon to it.count }
     )
 
+@FlowPreview
 @ExperimentalStdlibApi
-suspend fun populateDatabase(database: Database, tools: TweetsElaborationTools) {
+suspend fun populateDatabase(
+    database: Database,
+    tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
+) {
 
-    Resources.Tweets.forEach { (sentiment, tweets) ->
-        val elaboratedTweets = tweets.map {
-            with(tools) {
-                elaborateTweet(
-                    sentiment, it, punctuation, slangMap,
-                    stopwords, stemmer, posTagger, tokenizer
-                )
-            }
-        }
-
-        newSuspendedTransaction(db = database) {
-            elaboratedTweets.forEach {
-                it.toEntity()
-            }
-        }
+    newSuspendedTransaction(db = database) {
+        SchemaUtils.createMissingTablesAndColumns(
+            TweetsTable,
+            TweetEmojisTable,
+            TweetEmoticonsTable,
+            TweetHashtagsTable
+        )
     }
+
+    Resources.Tweets.entries.asFlow()
+        .flatMapMerge { (sentiment, tweets) ->
+            tweets.map { sentiment to it }.asFlow()
+        }
+        .map { (sentiment, tweet) -> elaborateTweet(sentiment, tweet, tools) }
+        .chunked(100)
+        .onEach {
+            newSuspendedTransaction(db = database) {
+                it.forEach { it.toEntity() }
+            }
+        }
+        .collect()
 
 }

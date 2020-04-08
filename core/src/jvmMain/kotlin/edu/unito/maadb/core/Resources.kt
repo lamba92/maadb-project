@@ -39,7 +39,7 @@ object Resources {
 
     val PUNCTUATION
         get() = getResource("Risorse lessicali/punctuation-list.txt")
-            .readLines()
+
 
     object Tweets : AbstractMap<Sentiment, List<String>>() {
 
@@ -77,7 +77,7 @@ object Resources {
                 Sentiment.JOY to JOY,
                 Sentiment.SADNESS to SADNESS,
                 Sentiment.SURPRISE to SURPRISE,
-                Sentiment.TRUST to TRUST,
+                Sentiment.TRUST to TRUST
             )
 
     }

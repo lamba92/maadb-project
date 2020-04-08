@@ -4,7 +4,7 @@ RUN apt update
 RUN apt upgrade -y
 RUN apt install openjdk-8-jdk -y
 
-COPY build/sql-analytics-server.tar sql-analytics-server.tar
+COPY sql-analytics-server.tar sql-analytics-server.tar
 RUN tar -xf sql-analytics-server.tar
 RUN rm sql-analytics-server.tar
 

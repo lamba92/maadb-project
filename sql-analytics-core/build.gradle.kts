@@ -1,30 +1,24 @@
 @file:Suppress("UNUSED_VARIABLE")
 
 plugins {
-    kotlin("multiplatform")
+    id("maadb-project-plugin")
     kotlin("plugin.serialization")
 }
 
-kotlin {
+kotlin.sourceSets {
 
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+    val commonMain by getting {
+        dependencies {
+            api(project(":sql"))
         }
     }
 
-    sourceSets {
-
-        val commonMain by getting {
-            dependencies {
-                api(project(":sql"))
-            }
-        }
-
-        val jvmMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-jdk8"))
-            }
+    val jvmMain by getting {
+        dependencies {
+            val postgresDriversVersion: String by project
+            implementation(kotlin("stdlib-jdk8"))
+            implementation("org.postgresql:postgresql:$postgresDriversVersion")
         }
     }
+
 }

@@ -5,12 +5,11 @@ plugins {
 
 allprojects {
     group = "com.github.lamba92"
-    version = "1.0-SNAPSHOT"
+    version = "1.0.2"
 }
 
 subprojects {
     repositories {
-        maven("https://dl.bintray.com/kotlin/kotlin-eap")
         maven("https://jitpack.io")
         mavenCentral()
         jcenter()

@@ -14,7 +14,6 @@ dependencies {
     val ktorVersion: String by project
     val mySqlDriversVersion: String by project
     val sqliteDriversVersion: String by project
-    val postgresDriversVersion: String by project
 
     api(project(":sql-analytics-core"))
     implementation(kotlin("stdlib-jdk8"))
@@ -23,13 +22,6 @@ dependencies {
     implementation("io.ktor", "ktor-locations", ktorVersion)
     implementation("mysql", "mysql-connector-java", mySqlDriversVersion)
     implementation("org.xerial", "sqlite-jdbc", sqliteDriversVersion)
-    implementation("org.postgresql", "postgresql", postgresDriversVersion)
-}
-
-task<Copy>("copyDistToDocker") {
-    dependsOn(tasks.distTar)
-    from(tasks.distTar.get())
-    into("$rootDir/docker/sql-analytics-server/build")
 }
 
 tasks {

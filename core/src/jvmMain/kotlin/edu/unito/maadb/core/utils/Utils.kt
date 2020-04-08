@@ -54,17 +54,12 @@ fun POSTagger.tag(sentence: List<String>): List<String> =
 fun elaborateTweet(
     sentiment: Sentiment,
     message: String,
-    punctuation: List<String>,
-    slangMap: Map<String, String>,
-    stopwords: List<String>,
-    stemmer: Stemmer,
-    posTagger: POSTagger,
-    tokenizer: Tokenizer
+    tools: TweetsElaborationTools
 ): ElaboratedTweet {
 
     val cleanMessage = cleanTweet(message)
         .toLowerCase()
-        .let { expandSlang(it, slangMap) }
+        .let { expandSlang(it, tools.slangMap) }
 
     val hashtags = extractHashtags(cleanMessage)
         .groupingBy { it }
@@ -74,14 +69,14 @@ fun elaborateTweet(
     val tokenizedMessage: List<String> = cleanMessage.split(" ")
         .filter { it !in hashtags || it !in emojis.keys || it !in emoticons.keys }
         .joinToString(" ")
-        .let { removePunctuation(it, punctuation) }
-        .let { tokenizer.tokenize(it) }
+        .let { removePunctuation(it, tools.punctuation) }
+        .let { tools.tokenizer.tokenize(it) }
         .toList()
 
-    val pos = posTagger.tag(tokenizedMessage)
+    val pos = tools.posTagger.tag(tokenizedMessage)
 
-    val finalMessage = tokenizedMessage.map { stemmer.stem(it).toString() }
-        .filter { it !in stopwords }
+    val finalMessage = tokenizedMessage.map { tools.stemmer.stem(it).toString() }
+        .filter { it !in tools.stopwords }
         .groupingBy { it }
         .eachCount()
 
@@ -138,7 +133,7 @@ data class TweetsElaborationTools(
     companion object {
         val Defaults
             get() = TweetsElaborationTools(
-                Resources.PUNCTUATION,
+                Resources.PUNCTUATION.readLines(),
                 Resources.ACRONYMS,
                 Resources.STOPWORDS,
                 SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH),
