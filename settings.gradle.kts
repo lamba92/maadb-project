@@ -7,10 +7,14 @@ pluginManagement {
     }
     resolutionStrategy {
         val kotlinVersion: String by settings
+        val dockerGradlePluginVersion: String by settings
         eachPlugin {
             when (requested.id.id) {
-                "org.jetbrains.kotlin.plugin.serialization", "org.jetbrains.kotlin.multiplatform" ->
-                    useVersion(kotlinVersion)
+                "org.jetbrains.kotlin.plugin.serialization", "org.jetbrains.kotlin.multiplatform",
+                "org.jetbrains.kotlin.jvm "
+                -> useVersion(kotlinVersion)
+                "com.palantir.docker", "com.palantir.docker-compose", "com.palantir.docker-run"
+                -> useVersion(dockerGradlePluginVersion)
             }
         }
     }

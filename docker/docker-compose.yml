@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  jupyter-kotlin:
+    build: jupyter-kotlin
+    container_name: jupyter-kotlin
+    ports:
+      - 8888:8888
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD="postgrespwd"
+    ports:
+      - 5432:5432
+  sql-analitics-server:
+    build: sql-analytics-server
+    container_name: sql-analitics-server
+    command: sql-analytics-server
+    restart: always
+    environment:
+      - DATABASE_URL="jdbc:postgres//sql-analitics-server:5432"
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD="postgrespwd"
+    ports:
+      - 8080:8080

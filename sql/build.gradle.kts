@@ -29,6 +29,7 @@ kotlin {
                 val coroutinesVersion: String by project
                 val kotlinxSerializationVersion: String by project
                 implementation(kotlin("stdlib-jdk8"))
+                api(kotlin("reflect"))
                 api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
                 api("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")

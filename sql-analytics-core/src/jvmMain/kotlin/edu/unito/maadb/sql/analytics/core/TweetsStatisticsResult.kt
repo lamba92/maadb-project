@@ -1,4 +1,4 @@
-package edu.unito.maadb.analytics.core
+package edu.unito.maadb.sql.analytics.core
 
 import edu.unito.maadb.core.utils.Sentiment
 import kotlinx.serialization.Serializable

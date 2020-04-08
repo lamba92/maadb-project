@@ -1,8 +1,8 @@
-package edu.unito.maadb.analytics.server
+package edu.unito.maadb.sql.analytics.server
 
-import edu.unito.maadb.analytics.core.HashtagsStatisticsResult
-import edu.unito.maadb.analytics.core.TweetsStatisticsResult
 import edu.unito.maadb.core.Resources
+import edu.unito.maadb.sql.analytics.core.HashtagsStatisticsResult
+import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
 import edu.unito.maadb.sql.daos.TweetEntity
 import edu.unito.maadb.sql.tables.TweetsTable
 import io.ktor.application.Application
@@ -54,7 +54,12 @@ fun Application.sqlAnalyticServer() {
                     }
                     val newWords =
                         wordsCounted.keys.filter { it !in Resources.LexicalData.Emotions.Specific.getValue(param.emotion) }
-                    call.respond(TweetsStatisticsResult(wordsCounted, newWords))
+                    call.respond(
+                        TweetsStatisticsResult(
+                            wordsCounted,
+                            newWords
+                        )
+                    )
                 }
 
             }
@@ -67,7 +72,12 @@ fun Application.sqlAnalyticServer() {
                             .map { it.hashtags.map { it.hashtag to it.count }.toMap() }
                             .merge()
                     }
-                    call.respond(HashtagsStatisticsResult(param.emotion, hashtagsCounted))
+                    call.respond(
+                        HashtagsStatisticsResult(
+                            param.emotion,
+                            hashtagsCounted
+                        )
+                    )
                 }
             }
 
