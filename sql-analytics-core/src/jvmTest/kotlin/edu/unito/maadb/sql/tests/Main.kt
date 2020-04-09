@@ -12,7 +12,7 @@ suspend fun main() {
         url = "jdbc:postgresql://192.168.1.158/maadb",
         driver = Driver::class.qualifiedName!!,
         user = "postgres",
-        password = "\"postgrespwd\""
+        password = "postgres"
     )
     populateDatabase(db)
 }

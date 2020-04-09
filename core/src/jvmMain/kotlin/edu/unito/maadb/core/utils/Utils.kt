@@ -1,5 +1,6 @@
 package edu.unito.maadb.core.utils
 
+import com.vdurmont.emoji.EmojiParser
 import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
 import opennlp.tools.postag.POSModel
@@ -34,7 +35,9 @@ fun extractEmoticons(message: String) =
     extractByRegexp(message, emoticonsRegexp)
 
 fun extractEmojis(message: String) =
-    extractByRegexp(message, emojisRegexp)
+    EmojiParser.extractEmojis(message)
+        .groupingBy { it!! }
+        .eachCount()
 
 fun extractHashtags(tweet: String) =
     tweet.split(" ").filter { it.startsWith("#") }
@@ -92,12 +95,6 @@ fun elaborateTweet(
     )
 }
 
-val emojisRegexp by lazy {
-    Regex(
-        "(\\u00a9|\\u00ae|[\\u2000-\\u3300]|\\ud83c[\\ud000-" +
-                "\\udfff]|\\ud83d[\\ud000-\\udfff]|\\ud83e[\\ud000-\\udfff])"
-    )
-}
 val emoticonsRegexp by lazy {
     Regex(
         "(\\:\\w+\\:|\\<[\\/\\\\]?3|[\\(\\)\\\\\\D|\\*\\\$]" +

@@ -1,4 +1,9 @@
 version: "3.7"
+
+volumes:
+  postgres-volume:
+  jupyter-data:
+
 services:
   jupyter-kotlin:
     build: jupyter-kotlin
@@ -6,14 +11,26 @@ services:
     container_name: jupyter-kotlin
     ports:
       - 8888:8888
+    volumes:
+      - type: bind
+        source: ~/notebooks
+        target: /notebooks
+      - type: volume
+        source: jupyter-data
+        target: /root/.jupyter
+
   postgres:
     image: postgres
     container_name: postgres
     restart: always
     environment:
-      - POSTGRES_PASSWORD="postgrespwd"
+      - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
+    volumes:
+      - type: volume
+        source: postgres-volume
+        target: /var/lib/postgresql/data
   sql-analitycs-server:
     build: sql-analytics-server
     container_name: sql-analytics-server
@@ -22,6 +39,6 @@ services:
     environment:
       - DATABASE_URL="jdbc:postgres//postgres:5432"
       - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgrespw
+      - DATABASE_PASSWORD=postgres
     ports:
       - 8080:8080
