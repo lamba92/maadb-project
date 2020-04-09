@@ -4,10 +4,12 @@ package edu.unito.maadb.core
 
 import edu.unito.maadb.core.utils.Sentiment
 import edu.unito.maadb.core.utils.entriesOf
-import it.lamba.utils.getResource
 import java.io.File
 
 object Resources {
+
+    private fun getResource(name: String) =
+        it.lamba.utils.getResource(name, classLoader = Resources::class.java.classLoader)
 
     val PRE_TRAINED_POS_TAGGER_MODEL
         get() = getResource("Risorse lessicali/en-pos-maxent.bin")
@@ -21,9 +23,11 @@ object Resources {
             .readLines()
 
     private fun File.readTsvPairs(): List<Pair<String, String>> {
-        val reg = Regex("(.*)\\t(.*)")
+        val reg = Regex("^([\\w'-\\?\\|]*)\\s+(.*)")
         return readLines().map {
-            reg.find(it)!!.groupValues.let { it[0] to it[1] }
+            reg.find(it)?.groupValues?.let {
+                it[1] to it[2]
+            } ?: throw IllegalArgumentException("${reg.pattern} not found in $it")
         }
     }
 

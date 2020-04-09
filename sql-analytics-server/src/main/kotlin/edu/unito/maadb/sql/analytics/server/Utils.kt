@@ -8,7 +8,17 @@ fun <K> MutableMap<K, Int>.merge(map: Map<K, Int>) = map.forEach { (k, v) ->
     this[k] = if (containsKey(k)) getValue(k) + v else v
 }
 
+fun <K> MutableMap<K, Int>.merge(element: Pair<K, Int>) {
+    this[element.first] = if(containsKey(element.first)) getValue(element.first) + element.second else element.second
+}
+
 fun <K> Iterable<Map<K, Int>>.merge(accumulator: MutableMap<K, Int> = mutableMapOf()): Map<K, Int> {
+    forEach { accumulator.merge(it) }
+    return accumulator
+}
+
+@JvmName("mergeList")
+fun <K> Iterable<Pair<K, Int>>.merge(accumulator: MutableMap<K, Int> = mutableMapOf()): Map<K, Int> {
     forEach { accumulator.merge(it) }
     return accumulator
 }
@@ -16,5 +26,7 @@ fun <K> Iterable<Map<K, Int>>.merge(accumulator: MutableMap<K, Int> = mutableMap
 @KtorExperimentalLocationsAPI
 @Location("bySpecificEmotion/{emotion}")
 class EmotionLocation(emotion: String) {
-    val emotion by lazy { Sentiment.valueOf(emotion.toUpperCase()) }
+    val emotion by lazy {
+        Sentiment.valueOf(emotion.toUpperCase())
+    }
 }

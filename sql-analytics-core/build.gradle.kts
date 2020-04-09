@@ -5,20 +5,17 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-kotlin.sourceSets {
+kotlin.sourceSets["jvmMain"].dependencies {
 
-    val commonMain by getting {
-        dependencies {
-            api(project(":sql"))
-        }
-    }
+    val postgresDriversVersion: String by project
+    val mySqlDriversVersion: String by project
+    val sqliteDriversVersion: String by project
 
-    val jvmMain by getting {
-        dependencies {
-            val postgresDriversVersion: String by project
-            implementation(kotlin("stdlib-jdk8"))
-            implementation("org.postgresql:postgresql:$postgresDriversVersion")
-        }
-    }
+    implementation(kotlin("stdlib-jdk8"))
+
+    api(project(":sql"))
+    api("org.postgresql:postgresql:$postgresDriversVersion")
+    api("mysql:mysql-connector-java:$mySqlDriversVersion")
+    api("org.xerial:sqlite-jdbc:$sqliteDriversVersion")
 
 }

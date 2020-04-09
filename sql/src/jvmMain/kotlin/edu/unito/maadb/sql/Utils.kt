@@ -34,6 +34,7 @@ fun ElaboratedTweet.toEntity(): TweetEntity {
             tweet = tweetEntity
             hashtag = ht
             count = cnt
+            sentiment = this@toEntity.sentiment
         }
     }
 
@@ -42,6 +43,7 @@ fun ElaboratedTweet.toEntity(): TweetEntity {
             tweet = tweetEntity
             emoji = emj
             count = cnt
+            sentiment = this@toEntity.sentiment
         }
     }
 
@@ -50,6 +52,7 @@ fun ElaboratedTweet.toEntity(): TweetEntity {
             tweet = tweetEntity
             emoticon = emt
             count = cnt
+            sentiment = this@toEntity.sentiment
         }
     }
 

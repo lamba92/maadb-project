@@ -2,53 +2,53 @@ package edu.unito.maadb.core.utils
 
 import com.vdurmont.emoji.EmojiParser
 import edu.unito.maadb.core.ElaboratedTweet
-import edu.unito.maadb.core.Resources
-import opennlp.tools.postag.POSModel
+import emoji4j.EmojiManager
+import emoji4j.EmojiUtils
 import opennlp.tools.postag.POSTagger
-import opennlp.tools.postag.POSTaggerME
-import opennlp.tools.stemmer.Stemmer
-import opennlp.tools.stemmer.snowball.SnowballStemmer
-import opennlp.tools.tokenize.Tokenizer
-import opennlp.tools.tokenize.WhitespaceTokenizer
 
-fun extractByRegexp(message: String, regex: Regex) =
-    regex.findAll(message)
-        .map { it.value }
+fun extractByRegexp(message: String, regex: Regex): Pair<Map<String, Int>, String> {
+    val data = regex.findAll(message).map { it.value }
+        .toList()
         .groupingBy { it }
         .eachCount()
+    val cleaned = message.remove(data.keys)
+    return data to cleaned
+}
 
 @ExperimentalStdlibApi
 fun expandSlang(message: String, slangMap: Map<String, String>) =
-    message.split(" ")
-        .joinToString(" ") { slangMap[it] ?: it }
+    message.split(" ").joinToString(" ") { slangMap[it] ?: it }
 
 @ExperimentalStdlibApi
-fun removePunctuation(message: String, punctuation: List<String>): String {
-    var m = message
-    punctuation.forEach {
-        m = m.replace(it, " ")
+fun removePunctuation(message: String, punctuation: List<String>) =
+    message.remove(punctuation)
+
+fun String.remove(vararg words: String) =
+    remove(words.toList())
+
+fun String.remove(words: Iterable<String>): String {
+    var r = this
+    words.forEach {
+        r = r.remove(it)
     }
-    return m
+    return r
 }
 
 fun extractEmoticons(message: String) =
-    extractByRegexp(message, emoticonsRegexp)
+    extractByRegexp(message, EmojiManager.getEmoticonRegexPattern().toRegex())
 
-fun extractEmojis(message: String) =
+fun extractEmojis(message: String) = Pair(
     EmojiParser.extractEmojis(message)
         .groupingBy { it!! }
-        .eachCount()
+        .eachCount(),
+    EmojiUtils.removeAllEmojis(message)!!
+)
 
 fun extractHashtags(tweet: String) =
-    tweet.split(" ").filter { it.startsWith("#") }
+    extractByRegexp(tweet, Regex("(#[\\w\\d]+)"))
 
-fun cleanTweet(message: String) =
-    message.removeWord("URL").removeWord("USERNAME")
-
-fun String.removeWord(word: String) =
-    split(" ").filter { it != word }.joinToString(" ")
-
-//val posTagger = POSTaggerME(POSModel(getResource("Risorse lessicali/en-pos-maxent.bin")))
+fun String.remove(word: String) =
+    replace(word, "")
 
 fun POSTagger.tag(sentence: List<String>): List<String> =
     tag(sentence.toTypedArray()).toList()
@@ -60,19 +60,15 @@ fun elaborateTweet(
     tools: TweetsElaborationTools
 ): ElaboratedTweet {
 
-    val cleanMessage = cleanTweet(message)
+    val (hashtags, tweetWithoutHashtags) = extractHashtags(message)
+    val (emojis, tweetWithoutHashtagsAndEmojis) = extractEmojis(tweetWithoutHashtags)
+    val (emoticons, tweetWithoutHashtagsAndEmojisAndEmoticons) = extractEmoticons(tweetWithoutHashtagsAndEmojis)
+
+    val cleanMessage = tweetWithoutHashtagsAndEmojisAndEmoticons.remove("URL", "USERNAME")
         .toLowerCase()
         .let { expandSlang(it, tools.slangMap) }
 
-    val hashtags = extractHashtags(cleanMessage)
-        .groupingBy { it }
-        .eachCount()
-    val emojis = extractEmojis(cleanMessage)
-    val emoticons = extractEmoticons(cleanMessage)
-    val tokenizedMessage: List<String> = cleanMessage.split(" ")
-        .filter { it !in hashtags || it !in emojis.keys || it !in emoticons.keys }
-        .joinToString(" ")
-        .let { removePunctuation(it, tools.punctuation) }
+    val tokenizedMessage: List<String> = removePunctuation(cleanMessage, tools.punctuation)
         .let { tools.tokenizer.tokenize(it) }
         .toList()
 
@@ -95,20 +91,6 @@ fun elaborateTweet(
     )
 }
 
-val emoticonsRegexp by lazy {
-    Regex(
-        "(\\:\\w+\\:|\\<[\\/\\\\]?3|[\\(\\)\\\\\\D|\\*\\\$]" +
-                "[\\-\\^]?[\\:\\;\\=]|[\\:\\;\\=B8][\\-\\^]?[3DOPp\\@\\\$\\*\\\\\\)\\(\\/\\|])" +
-                "(?=\\s|[\\!\\.\\?]|\$)"
-    )
-}
-
-fun elaborateSentimentResource(resource: List<String>) =
-    resource.filter { "_" !in it }
-        .groupingBy { it }
-        // TODO percentage
-        .eachCount()
-
 fun <K, V> entriesOf(vararg entries: Pair<K, V>): Set<Map.Entry<K, V>> =
     entries.map {
         object : Map.Entry<K, V> {
@@ -119,23 +101,3 @@ fun <K, V> entriesOf(vararg entries: Pair<K, V>): Set<Map.Entry<K, V>> =
         }
     }.toSet()
 
-data class TweetsElaborationTools(
-    val punctuation: List<String>,
-    val slangMap: Map<String, String>,
-    val stopwords: List<String>,
-    val stemmer: Stemmer,
-    val posTagger: POSTagger,
-    val tokenizer: Tokenizer
-) {
-    companion object {
-        val Defaults
-            get() = TweetsElaborationTools(
-                Resources.PUNCTUATION.readLines(),
-                Resources.ACRONYMS,
-                Resources.STOPWORDS,
-                SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH),
-                POSTaggerME(POSModel(Resources.PRE_TRAINED_POS_TAGGER_MODEL)),
-                WhitespaceTokenizer.INSTANCE!!
-            )
-    }
-}

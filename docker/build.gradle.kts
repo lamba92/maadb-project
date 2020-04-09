@@ -21,8 +21,8 @@ val copyDockerData by tasks.creating {
     doLast {
         ssh.runSessions {
             session(dockerRemote) {
-                execute("rm -r -f ./docker")
                 execute("mkdir -p docker")
+                execute("rm -r -f ~/docker/*")
                 file("$projectDir/src").listFiles()!!.forEach {
                     put(it, "./docker")
                     if (it.name == "sql-analytics-server")

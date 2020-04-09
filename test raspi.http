@@ -1,0 +1,4 @@
+GET http://localhost:80/statistics/hashtags/bySpecificEmotion/joy
+Accept: application/json
+
+###

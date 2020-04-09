@@ -6,4 +6,5 @@ object TweetHashtagsTable : LongIdTable("tweets_hashtags_table") {
     val tweetId = reference("tweet_id", TweetsTable)
     val hashtag = varchar("hashtag", 280)
     val count = integer("count")
+    val sentiment = varchar("sentiment", 15)
 }

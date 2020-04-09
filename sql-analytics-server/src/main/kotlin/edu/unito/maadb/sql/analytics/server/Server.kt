@@ -4,6 +4,8 @@ import edu.unito.maadb.core.Resources
 import edu.unito.maadb.sql.analytics.core.HashtagsStatisticsResult
 import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
 import edu.unito.maadb.sql.daos.TweetEntity
+import edu.unito.maadb.sql.daos.TweetHashtagEntity
+import edu.unito.maadb.sql.tables.TweetHashtagsTable
 import edu.unito.maadb.sql.tables.TweetsTable
 import io.ktor.application.Application
 import io.ktor.application.call
@@ -26,9 +28,9 @@ fun Application.sqlAnalyticServer() {
 
     val db by lazy {
         Database.connect(
-            url = System.getenv("DATABASE_URL") ?: "jdbc:sqlite://db.sqlite",
-            user = System.getenv("DATABASE_USER") ?: "",
-            password = System.getenv("DATABASE_PASSWORD") ?: ""
+            url = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://192.168.1.158:5432/maadb",
+            user = System.getenv("DATABASE_USER") ?: "postgres",
+            password = System.getenv("DATABASE_PASSWORD") ?: "postgres"
         ).also {
             TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         }
@@ -43,15 +45,20 @@ fun Application.sqlAnalyticServer() {
     routing {
         route("statistics") {
             route("tweets") {
+
                 get<EmotionLocation> { param ->
                     val wordsCounted = newSuspendedTransaction(db = db) {
                         TweetEntity.find { TweetsTable.sentiment eq param.emotion.toString() }
                             .map { it.stemmedTweetWithOccurrences }
                             .merge()
                     }
-                    val newWords = wordsCounted.keys.filter {
-                        it !in Resources.LexicalData.Emotions.Specific.getValue(param.emotion)
-                    }
+
+                    val resources = Resources.LexicalData.Emotions.Specific
+                        .getValue(param.emotion)
+                        .filter { "_" !in it }
+
+                    val newWords = wordsCounted.keys.filter { it !in resources }
+
                     call.respond(
                         TweetsStatisticsResult(
                             param.emotion,
@@ -59,13 +66,15 @@ fun Application.sqlAnalyticServer() {
                             newWords
                         )
                     )
+
                 }
             }
+
             route("hashtags") {
                 get<EmotionLocation> { param ->
                     val hashtagsCounted = newSuspendedTransaction {
-                        TweetEntity.find { TweetsTable.sentiment eq param.emotion.toString() }
-                            .map { it.hashtags.map { it.hashtag to it.count }.toMap() }
+                        TweetHashtagEntity.find { TweetHashtagsTable.sentiment eq param.emotion.toString() }
+                            .map { it.hashtag to it.count }
                             .merge()
                     }
                     call.respond(
