@@ -1,6 +1,6 @@
 package edu.unito.maadb.sql.daos
 
-import edu.unito.maadb.core.utils.Sentiment
+import edu.unito.maadb.core.utils.SpecificSentiment
 import edu.unito.maadb.sql.tables.TweetEmojisTable
 import edu.unito.maadb.sql.tables.TweetEmoticonsTable
 import edu.unito.maadb.sql.tables.TweetHashtagsTable
@@ -29,13 +29,13 @@ class TweetEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var originalTweet by TweetsTable.originalTweet
 
-    var sentiment: Sentiment
-        get() = Sentiment.valueOf(sentiment_)
+    var sentiment: SpecificSentiment
+        get() = SpecificSentiment.valueOf(sentiment_)
         set(value) {
             sentiment_ = value.toString()
         }
     var tokenizedTweet: List<String>
-        get() = serializer.parse(String.serializer().list, sentiment_)
+        get() = serializer.parse(String.serializer().list, tokenizedTweet_)
         set(value) {
             tokenizedTweet_ = serializer.stringify(String.serializer().list, value)
         }

@@ -1,6 +1,6 @@
 package edu.unito.maadb.sql.daos
 
-import edu.unito.maadb.core.utils.Sentiment
+import edu.unito.maadb.core.utils.SpecificSentiment
 import edu.unito.maadb.sql.tables.TweetEmojisTable
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
@@ -12,8 +12,8 @@ class TweetEmojiEntity(id: EntityID<Long>) : LongEntity(id) {
 
     private var sentiment_ by TweetEmojisTable.sentiment
 
-    var sentiment: Sentiment
-        get() = Sentiment.valueOf(sentiment_)
+    var sentiment: SpecificSentiment
+        get() = SpecificSentiment.valueOf(sentiment_)
         set(value) {
             sentiment_ = value.toString()
         }

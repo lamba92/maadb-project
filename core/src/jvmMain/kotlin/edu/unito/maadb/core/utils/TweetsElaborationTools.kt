@@ -20,7 +20,7 @@ data class TweetsElaborationTools(
     companion object {
         val Defaults
             get() = TweetsElaborationTools(
-                Resources.PUNCTUATION.readLines(),
+                Resources.PUNCTUATION,
                 Resources.ACRONYMS,
                 Resources.STOPWORDS,
                 SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH),

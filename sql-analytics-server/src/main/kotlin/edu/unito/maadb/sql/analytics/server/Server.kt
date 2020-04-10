@@ -1,27 +1,42 @@
 package edu.unito.maadb.sql.analytics.server
 
+import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
-import edu.unito.maadb.sql.analytics.core.HashtagsStatisticsResult
+import edu.unito.maadb.sql.analytics.core.StatisticsResult
 import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
+import edu.unito.maadb.sql.daos.TweetEmojiEntity
+import edu.unito.maadb.sql.daos.TweetEmoticonEntity
 import edu.unito.maadb.sql.daos.TweetEntity
 import edu.unito.maadb.sql.daos.TweetHashtagEntity
+import edu.unito.maadb.sql.tables.TweetEmojisTable
+import edu.unito.maadb.sql.tables.TweetEmoticonsTable
 import edu.unito.maadb.sql.tables.TweetHashtagsTable
 import edu.unito.maadb.sql.tables.TweetsTable
+import edu.unito.maadb.sql.utils.toModel
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
+import io.ktor.http.ContentType
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
 import io.ktor.response.respond
+import io.ktor.response.respondText
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.sql.Connection
+import kotlin.math.ceil
 
 @KtorExperimentalLocationsAPI
 fun Application.sqlAnalyticServer() {
@@ -45,43 +60,75 @@ fun Application.sqlAnalyticServer() {
     routing {
         route("statistics") {
             route("tweets") {
-
-                get<EmotionLocation> { param ->
+                get<SentimentLocation> { (sentiment) ->
                     val wordsCounted = newSuspendedTransaction(db = db) {
-                        TweetEntity.find { TweetsTable.sentiment eq param.emotion.toString() }
+                        TweetEntity.find { TweetsTable.sentiment eq sentiment.toString() }
                             .map { it.stemmedTweetWithOccurrences }
                             .merge()
                     }
 
-                    val resources = Resources.LexicalData.Emotions.Specific
-                        .getValue(param.emotion)
+                    val resources = Resources.LexicalData.Sentiments.Specific
+                        .getValue(sentiment)
+                        .EVERY_RESOURCE
                         .filter { "_" !in it }
 
                     val newWords = wordsCounted.keys.filter { it !in resources }
 
-                    call.respond(
-                        TweetsStatisticsResult(
-                            param.emotion,
-                            wordsCounted,
-                            newWords
-                        )
-                    )
-
+                    call.respond(TweetsStatisticsResult(sentiment, wordsCounted, newWords))
                 }
             }
-
             route("hashtags") {
-                get<EmotionLocation> { param ->
-                    val hashtagsCounted = newSuspendedTransaction {
-                        TweetHashtagEntity.find { TweetHashtagsTable.sentiment eq param.emotion.toString() }
+                get<SentimentLocation> { (sentiment) ->
+                    val hashtagsCounted = newSuspendedTransaction(db = db) {
+                        TweetHashtagEntity.find { TweetHashtagsTable.sentiment eq sentiment.toString() }
                             .map { it.hashtag to it.count }
                             .merge()
                     }
-                    call.respond(
-                        HashtagsStatisticsResult(
-                            param.emotion,
-                            hashtagsCounted
-                        )
+                    call.respond(StatisticsResult(sentiment, hashtagsCounted))
+                }
+            }
+            route("emoticons") {
+                get<SentimentLocation> { (sentiment) ->
+                    val emoticonsCounted = newSuspendedTransaction(db = db) {
+                        TweetEmoticonEntity.find { TweetEmoticonsTable.sentiment eq sentiment.toString() }
+                            .map { it.emoticon to it.count }
+                            .merge()
+                    }
+                    call.respond(StatisticsResult(sentiment, emoticonsCounted))
+                }
+            }
+            route("emojis") {
+                get<SentimentLocation> { (sentiment) ->
+                    val emojisCounted = newSuspendedTransaction(db = db) {
+                        TweetEmojiEntity.find { TweetEmojisTable.sentiment eq sentiment.toString() }
+                            .map { it.emoji to it.count }
+                            .merge()
+                    }
+                    call.respond(StatisticsResult(sentiment, emojisCounted))
+                }
+            }
+        }
+        route("data") {
+            route("tweets") {
+                get<SentimentPagedLocation> { (emotion, page, pageSize) ->
+                    val (totalPages, data) = newSuspendedTransaction(db = db) {
+                        TweetEntity.find { TweetsTable.sentiment eq emotion.toString() }.let {
+                            ceil(it.count() / pageSize.toFloat()).toInt() to it.limit(
+                                    pageSize,
+                                    page * pageSize.toLong()
+                                )
+                                .asFlow()
+                                .map { it.toModel() }
+                                .toList()
+                        }
+                    }
+                    val deserializer = Json(JsonConfiguration.Stable)
+                    call.respondText(
+                        deserializer.stringify(
+                            PagedData.serializer(ElaboratedTweet.serializer().list),
+                            PagedData(data, page, pageSize, totalPages)
+                        ),
+                        ContentType.Application.Json
                     )
                 }
             }

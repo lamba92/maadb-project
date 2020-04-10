@@ -1,8 +1,9 @@
 package edu.unito.maadb.sql.analytics.server
 
-import edu.unito.maadb.core.utils.Sentiment
+import edu.unito.maadb.core.utils.SpecificSentiment
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
+import kotlinx.serialization.Serializable
 
 fun <K> MutableMap<K, Int>.merge(map: Map<K, Int>) = map.forEach { (k, v) ->
     this[k] = if (containsKey(k)) getValue(k) + v else v
@@ -24,9 +25,31 @@ fun <K> Iterable<Pair<K, Int>>.merge(accumulator: MutableMap<K, Int> = mutableMa
 }
 
 @KtorExperimentalLocationsAPI
-@Location("bySpecificEmotion/{emotion}")
-class EmotionLocation(emotion: String) {
-    val emotion by lazy {
-        Sentiment.valueOf(emotion.toUpperCase())
+@Location("bySpecificSentiment/{sentiment}")
+class SentimentLocation(sentiment: String) {
+    val sentiment by lazy {
+        SpecificSentiment.valueOf(sentiment.toUpperCase())
     }
+
+    operator fun component1() = sentiment
 }
+
+@KtorExperimentalLocationsAPI
+@Location("bySpecificSentiment/{sentiment}")
+class SentimentPagedLocation(sentiment: String, val page: Int = 0, val pageSize: Int = 100) {
+    val sentiment by lazy {
+        SpecificSentiment.valueOf(sentiment.toUpperCase())
+    }
+
+    operator fun component1() = sentiment
+    operator fun component2() = page
+    operator fun component3() = pageSize
+}
+
+@Serializable
+data class PagedData<T>(
+    val data: T,
+    val page: Int,
+    val pageSize: Int,
+    val totalPages: Int
+)

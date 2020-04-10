@@ -1,23 +1,18 @@
-package edu.unito.maadb.sql
+package edu.unito.maadb.sql.utils
 
 import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
-import edu.unito.maadb.core.utils.Sentiment
 import edu.unito.maadb.core.utils.TweetsElaborationTools
 import edu.unito.maadb.core.utils.elaborateTweet
 import edu.unito.maadb.sql.daos.TweetEmojiEntity
 import edu.unito.maadb.sql.daos.TweetEmoticonEntity
 import edu.unito.maadb.sql.daos.TweetEntity
 import edu.unito.maadb.sql.daos.TweetHashtagEntity
-import edu.unito.maadb.sql.tables.TweetEmojisTable
-import edu.unito.maadb.sql.tables.TweetEmoticonsTable
-import edu.unito.maadb.sql.tables.TweetHashtagsTable
-import edu.unito.maadb.sql.tables.TweetsTable
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 fun ElaboratedTweet.toEntity(): TweetEntity {
@@ -71,43 +66,27 @@ fun TweetEntity.toModel() =
         emoticons.associate { it.emoticon to it.count }
     )
 
-@OptIn(ExperimentalStdlibApi::class, FlowPreview::class)
-suspend fun populateDatabase(
-    database: Database,
-    tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
-): Map<Sentiment, List<TweetEntity>> {
-
-    newSuspendedTransaction(db = database) {
-        SchemaUtils.createMissingTablesAndColumns(
-            TweetsTable,
-            TweetEmojisTable,
-            TweetEmoticonsTable,
-            TweetHashtagsTable
+@FlowPreview
+@ExperimentalStdlibApi
+suspend fun populateTweets(
+    tools: TweetsElaborationTools,
+    database: Database
+) = Resources.Tweets.entries.asFlow()
+    .flatMapMergeIterable { (sentiment, tweets) ->
+        tweets.map { sentiment to it }
+    }
+    .map { (sentiment, tweet) ->
+        elaborateTweet(
+            sentiment,
+            tweet,
+            tools
         )
     }
-
-    return Resources.Tweets.entries.asFlow()
-        .flatMapMergeIterable { (sentiment, tweets) ->
-            tweets.map { sentiment to it }
+    .chunked(100)
+    .flatMapMergeIterable {
+        newSuspendedTransaction(db = database) {
+            it.map { it.toEntity() }
         }
-        .map { (sentiment, tweet) -> elaborateTweet(sentiment, tweet, tools) }
-        .chunked(100)
-        .flatMapMergeIterable {
-            newSuspendedTransaction(db = database) {
-                it.map { it.toEntity() }
-            }
-        }
-        .toList()
-        .groupBy { it.sentiment }
-
-}
-
-fun populateDatabaseBlocking(
-    database: Database,
-    tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
-) = runBlocking { populateDatabase(database, tools) }
-
-@OptIn(FlowPreview::class)
-fun <T, R> Flow<T>.flatMapMergeIterable(
-    transform: suspend (T) -> Iterable<R>
-): Flow<R> = flatMapMerge { transform(it).asFlow() }
+    }
+    .toList()
+    .groupBy { it.sentiment }

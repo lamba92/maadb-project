@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = "com.github.lamba92"
-    version = "1.0.5"
+    version = "1.0.8"
 }
 
 subprojects {

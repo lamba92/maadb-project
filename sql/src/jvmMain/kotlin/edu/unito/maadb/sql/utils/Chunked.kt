@@ -1,4 +1,4 @@
-package edu.unito.maadb.sql
+package edu.unito.maadb.sql.utils
 
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

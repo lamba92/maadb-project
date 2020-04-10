@@ -2,6 +2,7 @@
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     application
 }
 
@@ -18,7 +19,7 @@ dependencies {
     val ktorVersion: String by project
     val logbackVersion: String by project
 
-    implementation(project(":sql-analytics-core"))
+//    implementation(project(":sql-analytics-core"))
 
     implementation(kotlin("stdlib-jdk8"))
 
@@ -26,7 +27,7 @@ dependencies {
     implementation("io.ktor", "ktor-serialization", ktorVersion)
     implementation("io.ktor", "ktor-locations", ktorVersion)
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-//    implementation("com.github.lamba92:maadb-project-sql-analytics-core-jvm:+")
+    implementation("com.github.lamba92:maadb-project-sql-analytics-core-jvm:1.0.8")
 
 }
 

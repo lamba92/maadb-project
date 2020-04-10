@@ -1,10 +1,12 @@
 package edu.unito.maadb.core
 
-import edu.unito.maadb.core.utils.Sentiment
+import edu.unito.maadb.core.utils.SpecificSentiment
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ElaboratedTweet(
     val originalTweet: String,
-    val sentiment: Sentiment,
+    val sentiment: SpecificSentiment,
     val tokenizedTweet: List<String>,
     val posTags: List<String>,
     val stemmedTweetWithOccurrences: Map<String, Int>,

@@ -55,7 +55,7 @@ fun POSTagger.tag(sentence: List<String>): List<String> =
 
 @ExperimentalStdlibApi
 fun elaborateTweet(
-    sentiment: Sentiment,
+    sentiment: SpecificSentiment,
     message: String,
     tools: TweetsElaborationTools
 ): ElaboratedTweet {

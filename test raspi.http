@@ -1,4 +1,4 @@
-GET http://localhost:80/statistics/hashtags/bySpecificEmotion/joy
+GET http://localhost:80/data/tweets/bySpecificSentiment/anger?pageSize=10&page=1
 Accept: application/json
 
 ###

@@ -2,7 +2,8 @@
 
 package edu.unito.maadb.core
 
-import edu.unito.maadb.core.utils.Sentiment
+import edu.unito.maadb.core.utils.GenericSentiment
+import edu.unito.maadb.core.utils.SpecificSentiment
 import edu.unito.maadb.core.utils.entriesOf
 import java.io.File
 
@@ -43,9 +44,10 @@ object Resources {
 
     val PUNCTUATION
         get() = getResource("Risorse lessicali/punctuation-list.txt")
+            .readLines()
 
 
-    object Tweets : AbstractMap<Sentiment, List<String>>() {
+    object Tweets : AbstractMap<SpecificSentiment, List<String>>() {
 
         val ANGER
             get() = getResource("Twitter messaggi/dataset_dt_anger_60k.txt")
@@ -74,211 +76,217 @@ object Resources {
 
         override val entries
             get() = entriesOf(
-                Sentiment.ANGER to ANGER,
-                Sentiment.ANTICIPATION to ANTICIPATION,
-                Sentiment.DISGUST to DISGUST,
-                Sentiment.FEAR to FEAR,
-                Sentiment.JOY to JOY,
-                Sentiment.SADNESS to SADNESS,
-                Sentiment.SURPRISE to SURPRISE,
-                Sentiment.TRUST to TRUST
+                SpecificSentiment.ANGER to ANGER,
+                SpecificSentiment.ANTICIPATION to ANTICIPATION,
+                SpecificSentiment.DISGUST to DISGUST,
+                SpecificSentiment.FEAR to FEAR,
+                SpecificSentiment.JOY to JOY,
+                SpecificSentiment.SADNESS to SADNESS,
+                SpecificSentiment.SURPRISE to SURPRISE,
+                SpecificSentiment.TRUST to TRUST
             )
 
     }
 
     object LexicalData {
 
-        object Emotions {
+        object Sentiments {
 
-            object Specific : AbstractMap<Sentiment, Set<String>>() {
+            object Specific : AbstractMap<SpecificSentiment, Specific.SpecificSentimentLexicalData>() {
 
-                object Anger {
-                    val EmoSN
-                        get() = getResource("Risorse lessicali/Anger/EmoSN_anger.txt")
-                            .readLines()
-                    val NRC
-                        get() = getResource("Risorse lessicali/Anger/NRC_anger.txt")
-                            .readLines()
-                    val SENTISENSE
-                        get() = getResource("Risorse lessicali/Anger/sentisense_anger.txt")
-                            .readLines()
+                interface SpecificSentimentLexicalData {
+
+                    val EmoSN: List<String>
+                        get() = emptyList()
+
+                    val NRC: List<String>
+                        get() = emptyList()
+
+                    val SENTISENSE: List<String>
+                        get() = emptyList()
 
                     val EVERY_RESOURCE
                         get() = (EmoSN + NRC + SENTISENSE).toSet()
-
                 }
 
-                object Anticipation {
-                    val NRC
+                object Anger : SpecificSentimentLexicalData {
+                    override val EmoSN
+                        get() = getResource("Risorse lessicali/Anger/EmoSN_anger.txt")
+                            .readLines()
+                    override val NRC
+                        get() = getResource("Risorse lessicali/Anger/NRC_anger.txt")
+                            .readLines()
+                    override val SENTISENSE
+                        get() = getResource("Risorse lessicali/Anger/sentisense_anger.txt")
+                            .readLines()
+                }
+
+                object Anticipation : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Anticipation/NRC_anticipation.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Anticipation/sentisense_anticipation.txt")
                             .readLines()
-
-                    val EVERY_RESOURCE
-                        get() = (NRC + SENTISENSE).toSet()
                 }
 
-                object Disgust {
-                    val NRC
+                object Disgust : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Disgust-Hate/NRC_disgust.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Disgust-Hate/sentisense_disgust.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = (NRC + SENTISENSE).toSet()
                 }
 
-                object Hate {
-                    val SENTISENSE
+                object Hate : SpecificSentimentLexicalData {
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Disgust-Hate/sentisense_hate.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = SENTISENSE.toSet()
                 }
 
-                object Fear {
-                    val NRC
+                object Fear : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Fear/NRC_fear.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Fear/sentisense_fear.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = (NRC + SENTISENSE).toSet()
                 }
 
-                object Hope {
-                    val SENTISENSE
+                object Hope : SpecificSentimentLexicalData {
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Hope/sentisense_hope.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = SENTISENSE.toSet()
                 }
 
-                object Joy {
-                    val EmoSN
+                object Joy : SpecificSentimentLexicalData {
+                    override val EmoSN
                         get() = getResource("Risorse lessicali/Joy/EmoSN_joy.txt")
                             .readLines()
-                    val NRC
+                    override val NRC
                         get() = getResource("Risorse lessicali/Joy/NRC_joy.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Joy/sentisense_joy.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = (EmoSN + NRC + SENTISENSE).toSet()
                 }
 
-                object Like {
-                    val SENTISENSE
+                object Like : SpecificSentimentLexicalData {
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Like-Love/sentisense_like.txt")
                             .readLines()
-                    val EVERY_RESOURCE
-                        get() = SENTISENSE.toSet()
                 }
 
-                object Love {
-                    val SENTISENSE
+                object Love : SpecificSentimentLexicalData {
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Like-Love/sentisense_love.txt")
                             .readLines()
-                    val EVERY_RESOURCE
-                        get() = SENTISENSE.toSet()
                 }
 
-                object Sadness {
-                    val NRC
+                object Sadness : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Sadness/NRC_sadness.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Sadness/sentisense_sadness.txt")
                             .readLines()
-                    val EVERY_RESOURCE
-                        get() = (NRC + SENTISENSE).toSet()
                 }
 
-                object Surprise {
-                    val NRC
+                object Surprise : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Surprise/NRC_surprise.txt")
                             .readLines()
-                    val SENTISENSE
+                    override val SENTISENSE
                         get() = getResource("Risorse lessicali/Surprise/sentisense_surprise.txt")
                             .readLines()
-                    val EVERY_RESOURCE
-                        get() = (NRC + SENTISENSE).toSet()
                 }
 
-                object Trust {
-                    val NRC
+                object Trust : SpecificSentimentLexicalData {
+                    override val NRC
                         get() = getResource("Risorse lessicali/Trust/NRC_trust.txt")
                             .readLines()
-                    val EVERY_RESOURCE
-                        get() = NRC.toSet()
                 }
 
                 override val entries
                     get() = entriesOf(
-                        Sentiment.ANGER to Anger.EVERY_RESOURCE,
-                        Sentiment.ANTICIPATION to Anticipation.EVERY_RESOURCE,
-                        Sentiment.DISGUST to Disgust.EVERY_RESOURCE,
-                        Sentiment.HATE to Hate.EVERY_RESOURCE,
-                        Sentiment.FEAR to Fear.EVERY_RESOURCE,
-                        Sentiment.HOPE to Hope.EVERY_RESOURCE,
-                        Sentiment.JOY to Joy.EVERY_RESOURCE,
-                        Sentiment.LIKE to Like.EVERY_RESOURCE,
-                        Sentiment.LOVE to Love.EVERY_RESOURCE,
-                        Sentiment.SADNESS to Sadness.EVERY_RESOURCE,
-                        Sentiment.SURPRISE to Surprise.EVERY_RESOURCE,
-                        Sentiment.TRUST to Trust.EVERY_RESOURCE
+                        SpecificSentiment.ANGER to Anger,
+                        SpecificSentiment.ANTICIPATION to Anticipation,
+                        SpecificSentiment.DISGUST to Disgust,
+                        SpecificSentiment.HATE to Hate,
+                        SpecificSentiment.FEAR to Fear,
+                        SpecificSentiment.HOPE to Hope,
+                        SpecificSentiment.JOY to Joy,
+                        SpecificSentiment.LIKE to Like,
+                        SpecificSentiment.LOVE to Love,
+                        SpecificSentiment.SADNESS to Sadness,
+                        SpecificSentiment.SURPRISE to Surprise,
+                        SpecificSentiment.TRUST to Trust
                     )
 
             }
 
-            object Generic {
+            object Generic : AbstractMap<GenericSentiment, Generic.GenericSentimentLexicalData>() {
 
-                object Positive {
-                    val GI
+                interface GenericSentimentLexicalData {
+
+                    val GI: List<String>
+                        get() = emptyList()
+
+                    val HL: List<String>
+                        get() = emptyList()
+
+                    val EFFECTIVE_TERMS: List<String>
+                        get() = emptyList()
+
+                    val LIWC: List<String>
+                        get() = emptyList()
+
+                    val EVERY_RESOURCE
+                        get() = (GI + HL + EFFECTIVE_TERMS + LIWC).toSet()
+                }
+
+                object Positive : GenericSentimentLexicalData {
+                    override val GI
                         get() = getResource("Risorse lessicali/Pos/GI_POS.txt")
                             .readLines()
-                    val HL
+                    override val HL
                         get() = getResource("Risorse lessicali/Pos/HL-positives.txt")
                             .readLines()
-                    val EFFECTIVE_TERMS
+                    override val EFFECTIVE_TERMS
                         get() = getResource("Risorse lessicali/Pos/listPosEffTerms.txt")
                             .readLines()
-                    val LIWC
+                    override val LIWC
                         get() = getResource("Risorse lessicali/Pos/LIWC-POS.txt")
                             .readLines()
 
-                    val EVERY_RESOURCE
-                        get() = (GI + HL + EFFECTIVE_TERMS + LIWC).toSet()
                 }
 
-                object Negative {
-                    val GI
+                object Negative : GenericSentimentLexicalData {
+                    override val GI
                         get() = getResource("Risorse lessicali/Neg/GI_NEG.txt")
                             .readLines()
-                    val HL
+                    override val HL
                         get() = getResource("Risorse lessicali/Neg/HL-negatives.txt")
                             .readLines()
-                    val EFFECTIVE_TERMS
+                    override val EFFECTIVE_TERMS
                         get() = getResource("Risorse lessicali/Neg/listNegEffTerms.txt")
                             .readLines()
-                    val LIWC
+                    override val LIWC
                         get() = getResource("Risorse lessicali/Neg/LIWC-NEG.txt")
                             .readLines()
-
-                    val EVERY_RESOURCE
-                        get() = (GI + HL + EFFECTIVE_TERMS + LIWC).toSet()
                 }
 
+                override val entries
+                    get() = entriesOf(
+                        GenericSentiment.POSITIVE to Positive,
+                        GenericSentiment.NEGATIVE to Negative
+                    )
             }
 
         }
@@ -302,6 +310,7 @@ object Resources {
                     .mapLinesInt()
 
             object ANEW {
+
                 val AROUSAL
                     get() = getResource("Risorse lessicali/ConScore/anewAro_tab.tsv")
                         .mapLinesFloat()
@@ -314,6 +323,7 @@ object Resources {
             }
 
             object DAL {
+
                 val ACTIVATION
                     get() = getResource("Risorse lessicali/ConScore/Dal_Activ.csv")
                         .mapLinesFloat()
