@@ -1,6 +1,5 @@
 package edu.unito.maadb.sql.analytics.server
 
-import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
 import edu.unito.maadb.sql.analytics.core.StatisticsResult
 import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
@@ -17,21 +16,16 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
-import io.ktor.http.ContentType
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlinx.serialization.builtins.list
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -122,14 +116,15 @@ fun Application.sqlAnalyticServer() {
                                 .toList()
                         }
                     }
-                    val deserializer = Json(JsonConfiguration.Stable)
-                    call.respondText(
-                        deserializer.stringify(
-                            PagedData.serializer(ElaboratedTweet.serializer().list),
-                            PagedData(data, page, pageSize, totalPages)
-                        ),
-                        ContentType.Application.Json
-                    )
+//                    val deserializer = Json(JsonConfiguration.Stable)
+                    call.respond(PagedData(data, page, pageSize, totalPages))
+//                    call.respondText(
+//                        deserializer.stringify(
+//                            PagedData.serializer(ElaboratedTweet.serializer().list),
+//                            PagedData(data, page, pageSize, totalPages)
+//                        ),
+//                        ContentType.Application.Json
+//                    )
                 }
             }
         }
