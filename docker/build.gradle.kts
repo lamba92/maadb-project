@@ -20,12 +20,21 @@ else
 
 if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
 
+    val distTar by evaluationDependsOn(":sql-analytics-server").tasks.named<Tar>("distTar")
+
+    val copySqlAnalyticsServerDistTar by tasks.registering(Sync::class) {
+        from(distTar.archiveFile)
+        into("$projectDir/src/sql-analytics-server")
+    }
+
     val projects = file("$projectDir/src").listFiles()!!
         .filter { it.isDirectory }
-        .map { it.name!! to CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name)!! }
+        .map { it!! to CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name)!! }
 
-    val buildTasks = projects.map { (folderName, camelName) ->
+    val buildTasks = projects.map { (folder, camelName) ->
         task<Exec>("build${camelName}Image") {
+            if (folder.name == "sql-server-analytics")
+                dependsOn(copySqlAnalyticsServerDistTar)
             group = "docker"
             commandLine(
                 "docker",
@@ -34,7 +43,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "-t",
                 "lamba92/jupyter-kotlin",
                 "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
-                "$projectDir/src/$folderName"
+                folder.absolutePath
             )
         }
     }
@@ -44,9 +53,11 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
         dependsOn(*buildTasks.toTypedArray())
     }
 
-    val publishTasks = projects.map { (folderName, camelName) ->
+    val publishTasks = projects.map { (folder, camelName) ->
         task<Exec>("publish${camelName}Image") {
             group = "docker"
+            if (folder.name == "sql-server-analytics")
+                dependsOn(copySqlAnalyticsServerDistTar)
             commandLine(
                 "docker",
                 "buildx",
@@ -54,7 +65,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "-t",
                 "lamba92/jupyter-kotlin",
                 "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
-                "$projectDir/src/$folderName",
+                folder.absolutePath,
                 "--push"
             )
         }

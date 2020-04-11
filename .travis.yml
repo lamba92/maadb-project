@@ -12,6 +12,7 @@ before_install:
   - chmod +x gradlew
 
 before_script:
+  - docker buildx version
   - docker run --rm --privileged docker/binfmt
   - docker buildx create --use --name multiArchBuilder
 
