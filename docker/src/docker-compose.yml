@@ -38,6 +38,8 @@ services:
     container_name: sql-analytics-server
     command: sql-analytics-server
     restart: always
+    deploy:
+      replicas: 2
     environment:
       - DATABASE_URL="jdbc:postgres//postgres:5432"
       - DATABASE_USER=postgres
@@ -45,18 +47,19 @@ services:
     ports:
       - 8080:80
 
-  mongo:
+  mongo-router:
     image: mongo
     restart: always
     ports:
       - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
-    volumes:
-      - type: volume
-        source: mongo-volume
-        target: /data/db
+
+  mongo-shard-1:
+    image: mongo
+    restart: always
+
+  mongo-shard-2:
+    image: mongo
+    restart: always
 
   mongo-express:
     image: mongo-express
