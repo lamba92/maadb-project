@@ -4,6 +4,7 @@ import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.core.Service
 import org.hidetake.groovy.ssh.session.SessionHandler
+import java.io.ByteArrayOutputStream
 
 plugins {
     id("org.hidetake.ssh")
@@ -14,6 +15,7 @@ plugins {
 val isDockerInstalled = if (OperatingSystem.current().isLinux)
     exec {
         commandLine("docker")
+        standardOutput = ByteArrayOutputStream()
     }.exitValue == 0
 else
     false
@@ -29,7 +31,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
 
     val projects = file("$projectDir/src").listFiles()!!
         .filter { it.isDirectory }
-        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name) ?: it.name!!) }
+        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name) ?: it.name) }
 
     val buildTasks = projects.map { (folder, camelName) ->
         task<Exec>("build${camelName}Image") {
@@ -42,7 +44,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "build",
                 "-t",
                 "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
+                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6",
                 folder.absolutePath
             )
         }
@@ -64,7 +66,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "build",
                 "-t",
                 "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
+                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6",
                 folder.absolutePath,
                 "--push"
             )
