@@ -48,7 +48,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 folder.absolutePath
             )
 
-            logging.captureStandardOutput(LogLevel.DEBUG)
+            logging.captureStandardOutput(LogLevel.INFO)
 
         }
     }
@@ -73,7 +73,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 folder.absolutePath,
                 "--push"
             )
-            logging.captureStandardOutput(LogLevel.DEBUG)
+            logging.captureStandardOutput(LogLevel.INFO)
         }
     }
 
