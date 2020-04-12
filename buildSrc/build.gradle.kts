@@ -19,9 +19,10 @@ dependencies {
 
     val kotlinVersion: String by project
     val lambaGradleUtilsVersion: String by project
+    val guavaVersion: String by project
 
     api(kotlin("stdlib-jdk8", kotlinVersion))
     api(kotlin("reflect", kotlinVersion))
     api("com.github.lamba92", "lamba-gradle-utils", lambaGradleUtilsVersion)
-
+    api("com.google.guava", "guava", guavaVersion)
 }

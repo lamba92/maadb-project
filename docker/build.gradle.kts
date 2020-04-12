@@ -1,4 +1,4 @@
-import org.gradle.internal.impldep.com.google.common.base.CaseFormat
+import com.google.common.base.CaseFormat
 import org.gradle.internal.os.OperatingSystem
 import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
@@ -29,7 +29,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
 
     val projects = file("$projectDir/src").listFiles()!!
         .filter { it.isDirectory }
-        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name)!! ?: it.name!!) }
+        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name) ?: it.name!!) }
 
     val buildTasks = projects.map { (folder, camelName) ->
         task<Exec>("build${camelName}Image") {
