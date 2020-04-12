@@ -1,6 +1,6 @@
 FROM ubuntu
 
-RUN apt update > /dev/null
+RUN apt update
 RUN apt upgrade -y > /dev/null
 RUN apt install openjdk-8-jdk -y > /dev/null
 

@@ -5,7 +5,7 @@ LABEL maintainer="Lamberto Basti@basti.lamberto@gmail.com"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Europe/Berlin
 
-RUN apt update > /dev/null
+RUN apt update
 RUN apt upgrade -y > /dev/null
 RUN apt install openjdk-8-jdk -y > /dev/null
 RUN apt install -yq --no-install-recommends build-essential emacs git inkscape jed libsm6 libxext-dev \
@@ -15,7 +15,7 @@ RUN apt install -yq --no-install-recommends build-essential emacs git inkscape j
 RUN apt install python3 python3-pip -y > /dev/null
 RUN apt install -y python3-setuptools > /dev/null
 RUN apt install -y python3-dev > /dev/null
-RUN apt clean > /dev/null
+RUN apt clean
 
 RUN pip3 install wheel > /dev/null
 RUN pip3 install jupyter > /dev/null
