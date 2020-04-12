@@ -42,7 +42,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "build",
                 "-t",
                 "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
+                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6",
                 folder.absolutePath
             )
         }
@@ -64,7 +64,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "build",
                 "-t",
                 "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/arm/v8",
+                "--platform=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6",
                 folder.absolutePath,
                 "--push"
             )
