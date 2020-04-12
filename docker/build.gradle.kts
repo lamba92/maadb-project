@@ -47,9 +47,9 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 "--platform=linux/amd64,linux/arm64,linux/arm",
                 folder.absolutePath
             )
-
-            logging.captureStandardOutput(LogLevel.INFO)
-
+            doFirst {
+                logging.captureStandardOutput(LogLevel.INFO)
+            }
         }
     }
 
@@ -73,7 +73,9 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
                 folder.absolutePath,
                 "--push"
             )
-            logging.captureStandardOutput(LogLevel.INFO)
+            doFirst {
+                logging.captureStandardOutput(LogLevel.INFO)
+            }
         }
     }
 
