@@ -29,7 +29,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
 
     val projects = file("$projectDir/src").listFiles()!!
         .filter { it.isDirectory }
-        .map { it!! to CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name)!! }
+        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name)!! ?: it.name!!) }
 
     val buildTasks = projects.map { (folder, camelName) ->
         task<Exec>("build${camelName}Image") {

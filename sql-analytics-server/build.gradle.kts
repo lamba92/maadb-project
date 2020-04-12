@@ -15,7 +15,12 @@ repositories {
 }
 
 // workaround for https://youtrack.jetbrains.com/issue/KT-38165
-sourceSets["main"].resources.srcDir("$rootDir/core/src/jvmMain/resources")
+val copySourcesWorkaround by tasks.registering(Sync::class) {
+    from("$rootDir/core/src/jvmMain/resources")
+    into("$buildDir/workarounds/resources")
+}
+kotlin.target.compilations["main"].compileKotlinTask.dependsOn(copySourcesWorkaround.get())
+sourceSets["main"].resources.srcDir(copySourcesWorkaround.get().destinationDir)
 
 dependencies {
 
