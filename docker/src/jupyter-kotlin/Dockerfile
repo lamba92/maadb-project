@@ -4,7 +4,7 @@ LABEL maintainer="Lamberto Basti@basti.lamberto@gmail.com"
 
 RUN apt update
 RUN apt upgrade -y > /dev/null
-RUN apt install openjdk-8-jdk -y > /dev/null
+RUN apt install openjdk-8-jdk -y
 RUN apt install -yq --no-install-recommends build-essential wget > /dev/null
 RUN apt install python3 python3-pip -y > /dev/null
 RUN apt install -y python3-setuptools > /dev/null
