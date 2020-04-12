@@ -14,12 +14,15 @@ repositories {
     maven("https://dl.bintray.com/lamba92/com.github.lamba92")
 }
 
+// workaround for https://youtrack.jetbrains.com/issue/KT-38165
+sourceSets["main"].resources.srcDir("$rootDir/core/src/jvmMain/resources")
+
 dependencies {
 
     val ktorVersion: String by project
     val logbackVersion: String by project
 
-//    implementation(project(":sql-analytics-core"))
+    implementation(project(":sql-analytics-core"))
 
     implementation(kotlin("stdlib-jdk8"))
 
@@ -27,7 +30,6 @@ dependencies {
     implementation("io.ktor", "ktor-serialization", ktorVersion)
     implementation("io.ktor", "ktor-locations", ktorVersion)
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("com.github.lamba92:maadb-project-sql-analytics-core-jvm:1.0.8")
 
 }
 

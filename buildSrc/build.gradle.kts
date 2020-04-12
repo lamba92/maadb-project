@@ -10,22 +10,18 @@ gradlePlugin.plugins.create("firebase-multiplatform-gradle-plugin") {
 repositories {
     jcenter()
     mavenCentral()
+    google()
     maven("https://plugins.gradle.org/m2/")
+    maven("https://dl.bintray.com/lamba92/com.github.lamba92")
 }
 
 dependencies {
 
     val kotlinVersion: String by project
-    val sshGradlePluginVersion: String by project
-    val bintrayPluginVersion: String by project
-    val guavaVersion: String by project
+    val lambaGradleUtilsVersion: String by project
 
     api(kotlin("stdlib-jdk8", kotlinVersion))
     api(kotlin("reflect", kotlinVersion))
-    api("org.jetbrains.kotlin", "kotlin-gradle-plugin", kotlinVersion)
-    api("com.jfrog.bintray.gradle", "gradle-bintray-plugin", bintrayPluginVersion)
-    api("org.hidetake", "gradle-ssh-plugin", sshGradlePluginVersion)
-    api("org.jetbrains.kotlin", "kotlin-serialization", kotlinVersion)
-    api("com.google.guava", "guava", guavaVersion)
+    api("com.github.lamba92", "lamba-gradle-utils", lambaGradleUtilsVersion)
 
 }

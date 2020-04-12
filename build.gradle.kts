@@ -1,3 +1,5 @@
+import com.github.lamba92.gradle.utils.TRAVIS_TAG
+
 plugins {
     kotlin("multiplatform") apply false
     kotlin("plugin.serialization") apply false
@@ -5,7 +7,7 @@ plugins {
 
 allprojects {
     group = "com.github.lamba92"
-    version = "1.0.8"
+    version = TRAVIS_TAG ?: "1.0.8"
 }
 
 subprojects {

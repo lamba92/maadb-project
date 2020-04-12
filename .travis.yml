@@ -3,16 +3,12 @@ dist: bionic
 language: java
 jdk: openjdk8
 
-addons:
-  apt:
-    packages:
-      - docker-ce
-
 before_install:
   - chmod +x gradlew
+  - curl -fsSL https://get.docker.com | sh
   - docker buildx version
   - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-  - docker buildx create use mybuilder
+  - docker buildx create --use --name mybuilder
 
 script: ./gradlew build
 
