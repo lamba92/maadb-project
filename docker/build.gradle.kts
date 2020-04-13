@@ -40,13 +40,6 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
             "--platform=linux/amd64,linux/arm64,linux/arm",
             file("$projectDir/src/sql-analytics-server").absolutePath
         )
-        doFirst {
-            println("BUILD COMMANDS: ${commands.joinToString(", ")}")
-            println(
-                "FILES: ${file("$projectDir/src/sql-analytics-server").listFiles()!!
-                    .joinToString("\n") { it.absolutePath }}"
-            )
-        }
         commandLine(
             "docker",
             "buildx",
