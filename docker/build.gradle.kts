@@ -23,7 +23,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
 
     val distTar by evaluationDependsOn(":sql-analytics-server").tasks.named<Tar>("distTar")
 
-    val copySqlAnalyticsServerDistTar by tasks.registering(Sync::class) {
+    val copySqlAnalyticsServerDistTar by tasks.registering(Copy::class) {
         from(distTar.archiveFile)
         into("$projectDir/src/sql-analytics-server")
     }
