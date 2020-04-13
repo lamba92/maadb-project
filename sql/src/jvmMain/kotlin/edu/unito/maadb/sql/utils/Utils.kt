@@ -8,9 +8,6 @@ import edu.unito.maadb.sql.tables.TweetEmoticonsTable
 import edu.unito.maadb.sql.tables.TweetHashtagsTable
 import edu.unito.maadb.sql.tables.TweetsTable
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -46,7 +43,4 @@ fun populateDatabaseBlocking(
     )
 }
 
-@OptIn(FlowPreview::class)
-fun <T, R> Flow<T>.flatMapMergeIterable(
-    transform: suspend (T) -> Iterable<R>
-): Flow<R> = flatMapMerge { transform(it).asFlow() }
+

@@ -1,16 +1,14 @@
 package edu.unito.maadb.sql.utils
 
 import edu.unito.maadb.core.ElaboratedTweet
-import edu.unito.maadb.core.Resources
 import edu.unito.maadb.core.utils.TweetsElaborationTools
-import edu.unito.maadb.core.utils.elaborateTweet
+import edu.unito.maadb.core.utils.flatMapMergeIterable
+import edu.unito.maadb.core.utils.getTweetElaborationFlow
 import edu.unito.maadb.sql.daos.TweetEmojiEntity
 import edu.unito.maadb.sql.daos.TweetEmoticonEntity
 import edu.unito.maadb.sql.daos.TweetEntity
 import edu.unito.maadb.sql.daos.TweetHashtagEntity
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -71,18 +69,7 @@ fun TweetEntity.toModel() =
 suspend fun populateTweets(
     tools: TweetsElaborationTools,
     database: Database
-) = Resources.Tweets.entries.asFlow()
-    .flatMapMergeIterable { (sentiment, tweets) ->
-        tweets.map { sentiment to it }
-    }
-    .map { (sentiment, tweet) ->
-        elaborateTweet(
-            sentiment,
-            tweet,
-            tools
-        )
-    }
-    .chunked(100)
+) = getTweetElaborationFlow(tools)
     .flatMapMergeIterable {
         newSuspendedTransaction(db = database) {
             it.map { it.toEntity() }

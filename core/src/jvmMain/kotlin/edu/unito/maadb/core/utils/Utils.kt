@@ -2,8 +2,14 @@ package edu.unito.maadb.core.utils
 
 import com.vdurmont.emoji.EmojiParser
 import edu.unito.maadb.core.ElaboratedTweet
+import edu.unito.maadb.core.Resources
 import emoji4j.EmojiManager
 import emoji4j.EmojiUtils
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
 import opennlp.tools.postag.POSTagger
 
 fun extractByRegexp(message: String, regex: Regex): Pair<Map<String, Int>, String> {
@@ -101,3 +107,22 @@ fun <K, V> entriesOf(vararg entries: Pair<K, V>): Set<Map.Entry<K, V>> =
         }
     }.toSet()
 
+@FlowPreview
+@ExperimentalStdlibApi
+fun getTweetElaborationFlow(tools: TweetsElaborationTools) = Resources.Tweets.entries.asFlow()
+    .flatMapMergeIterable { (sentiment, tweets) ->
+        tweets.map { sentiment to it }
+    }
+    .map { (sentiment, tweet) ->
+        elaborateTweet(
+            sentiment,
+            tweet,
+            tools
+        )
+    }
+    .chunked(100)
+
+@OptIn(FlowPreview::class)
+fun <T, R> Flow<T>.flatMapMergeIterable(
+    transform: suspend (T) -> Iterable<R>
+): Flow<R> = flatMapMerge { transform(it).asFlow() }

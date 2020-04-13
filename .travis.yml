@@ -15,7 +15,7 @@ script: ./gradlew build
 
 deploy:
   provider: script
-  script: "./gradlew bintrayUpload :docker:publish"
+  script: "./gradlew :docker:publish bintrayUpload"
   skip_cleanup: true
   on:
     branch: master

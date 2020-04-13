@@ -34,7 +34,7 @@ services:
         target: /var/lib/postgresql/data
 
   sql-analitycs-server:
-    image: sql-analytics-server
+    image: lamba92/maadb-sql-analytics-server:1.0.9
     container_name: sql-analytics-server
     command: sql-analytics-server
     restart: always

@@ -9,6 +9,7 @@ kotlin.sourceSets["jvmMain"].dependencies {
     val emojiJavaVersion: String by project
     val emoji4jJavaVersion: String by project
     val kotlinxSerializationVersion: String by project
+    val coroutinesVersion: String by project
 
     implementation(kotlin("stdlib-jdk8"))
     api("com.github.lamba92:kresourceloader:$krlVersion") {
@@ -18,5 +19,6 @@ kotlin.sourceSets["jvmMain"].dependencies {
     api("com.vdurmont:emoji-java:$emojiJavaVersion")
     api("com.kcthota:emoji4j:$emoji4jJavaVersion")
     api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinxSerializationVersion")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
 }
