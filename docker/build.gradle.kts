@@ -36,9 +36,9 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
             "buildx",
             "build",
             "-t",
-            "lamba92/maadb-sql-analytics-server:$version",
+            "lamba92/maadb-sql-analytics-server",
             "--platform=linux/amd64,linux/arm64,linux/arm",
-            "$projectDir/src/sql-analytics-server"
+            file("$projectDir/src/sql-analytics-server").absolutePath
         )
     }
 
@@ -57,7 +57,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
             "-t",
             "lamba92/maadb-sql-analytics-server:$version",
             "--platform=linux/amd64,linux/arm64,linux/arm",
-            "$projectDir/src/sql-analytics-server",
+            file("$projectDir/src/sql-analytics-server").absolutePath,
             "--push"
         )
     }
