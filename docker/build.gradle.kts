@@ -1,4 +1,3 @@
-import com.google.common.base.CaseFormat
 import org.gradle.internal.os.OperatingSystem
 import org.hidetake.groovy.ssh.core.Remote
 import org.hidetake.groovy.ssh.core.RunHandler
@@ -29,53 +28,41 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
         into("$projectDir/src/sql-analytics-server")
     }
 
-    val projects = file("$projectDir/src").listFiles()!!
-        .filter { it.isDirectory }
-        .map { it!! to (CaseFormat.LOWER_HYPHEN.converterTo(CaseFormat.UPPER_CAMEL).convert(it.name) ?: it.name) }
-
-    val buildTasks = projects.map { (folder, camelName) ->
-        task<Exec>("build${camelName}Image") {
-            if (folder.name == "sql-server-analytics")
-                dependsOn(copySqlAnalyticsServerDistTar)
-            group = "docker"
-            commandLine(
-                "docker",
-                "buildx",
-                "build",
-                "-t",
-                "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm",
-                folder.absolutePath
-            )
-        }
+    val buildSqlAnalyticsServer by tasks.registering(Exec::class) {
+        group = "docker"
+        commandLine(
+            "docker",
+            "buildx",
+            "build",
+            "-t",
+            "lamba92/maadb-sql-analytics-server:$version",
+            "--platform=linux/amd64,linux/arm64,linux/arm",
+            "$projectDir/src/sql-analytics-server"
+        )
     }
 
     task("build") {
         group = "build"
-        dependsOn(*buildTasks.toTypedArray())
+        dependsOn(buildSqlAnalyticsServer)
     }
 
-    val publishTasks = projects.map { (folder, camelName) ->
-        task<Exec>("publish${camelName}Image") {
-            group = "docker"
-            if (folder.name == "sql-server-analytics")
-                dependsOn(copySqlAnalyticsServerDistTar)
-            commandLine(
-                "docker",
-                "buildx",
-                "build",
-                "-t",
-                "lamba92/jupyter-kotlin:$version",
-                "--platform=linux/amd64,linux/arm64,linux/arm",
-                folder.absolutePath,
-                "--push"
-            )
-        }
+    val publishSqlAnalyticsServer by tasks.registering(Exec::class) {
+        group = "docker"
+        commandLine(
+            "docker",
+            "buildx",
+            "build",
+            "-t",
+            "lamba92/maadb-sql-analytics-server:$version",
+            "--platform=linux/amd64,linux/arm64,linux/arm",
+            "$projectDir/src/sql-analytics-server",
+            "--push"
+        )
     }
 
     task("publish") {
         group = "publishing"
-        dependsOn(*publishTasks.toTypedArray())
+        dependsOn(publishSqlAnalyticsServer)
     }
 
 }
