@@ -29,6 +29,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
     }
 
     val buildSqlAnalyticsServer by tasks.registering(Exec::class) {
+        dependsOn(copySqlAnalyticsServerDistTar)
         group = "docker"
         commandLine(
             "docker",
@@ -47,6 +48,7 @@ if (isDockerInstalled && System.getenv("CI")?.toBoolean() == true) {
     }
 
     val publishSqlAnalyticsServer by tasks.registering(Exec::class) {
+        dependsOn(copySqlAnalyticsServerDistTar)
         group = "docker"
         commandLine(
             "docker",
