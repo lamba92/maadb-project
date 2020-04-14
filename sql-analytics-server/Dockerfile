@@ -13,3 +13,5 @@ RUN rm sql-analytics-server.tar
 
 ENV BIN_PATH="/sql-analytics-server/bin"
 ENV PATH="${PATH}:$BIN_PATH"
+
+CMD sql-analytics-server

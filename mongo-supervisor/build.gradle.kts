@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_VARIABLE")
-
 import org.gradle.internal.os.OperatingSystem
 import java.io.ByteArrayOutputStream
 
@@ -10,34 +8,18 @@ plugins {
 }
 
 application {
-    mainClassName = "edu.unito.maadb.sql.analytics.server.MainKt"
+    mainClassName = "edu.unito.maadb.mongosupervisor.MainKt"
 }
-
-repositories {
-    maven("https://dl.bintray.com/lamba92/com.github.lamba92")
-}
-
-// workaround for https://youtrack.jetbrains.com/issue/KT-38165
-val copySourcesWorkaround by tasks.registering(Sync::class) {
-    from("$rootDir/core/src/jvmMain/resources")
-    into("$buildDir/workarounds/resources")
-}
-kotlin.target.compilations["main"].compileKotlinTask.dependsOn(copySourcesWorkaround.get())
-sourceSets["main"].resources.srcDir(copySourcesWorkaround.get().destinationDir)
 
 dependencies {
 
-    val ktorVersion: String by project
-    val logbackVersion: String by project
-
-    implementation(project(":sql-analytics-core"))
+    val kMongoVersion: String by project
+    val kBsonVersion: String by project
 
     implementation(kotlin("stdlib-jdk8"))
-
-    implementation("io.ktor", "ktor-server-tomcat", ktorVersion)
-    implementation("io.ktor", "ktor-serialization", ktorVersion)
-    implementation("io.ktor", "ktor-locations", ktorVersion)
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    api("org.litote.kmongo:kmongo:$kMongoVersion")
+    api("org.litote.kmongo:kmongo-coroutine:$kMongoVersion")
+    api("com.github.jershell:kbson:$kBsonVersion")
 
 }
 

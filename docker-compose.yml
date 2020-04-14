@@ -1,0 +1,151 @@
+version: "3.7"
+
+networks:
+  mongo:
+
+volumes:
+  postgres-volume:
+  jupyter-data:
+#  mongo-cfg:
+#  mong-data:
+
+services:
+
+  jupyter-kotlin:
+    image: lamba92/jupyter-kotlin:1.0.0
+    ports:
+      - 8888:8888
+    volumes:
+      - type: bind
+        source: ~/notebooks
+        target: /notebooks
+      - type: volume
+        source: jupyter-data
+        target: /root/.jupyter
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  postgres:
+    image: postgres
+    deploy:
+      restart_policy:
+        delay: 0s
+        max_attempts: 10
+        window: 5s
+      placement:
+        constraints:
+          - node.role==manager
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - type: volume
+        source: postgres-volume
+        target: /var/lib/postgresql/data
+
+  sql-analitycs-server:
+    image: lamba92/maadb-project-sql-analytics-server:1.1.0
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 2
+    environment:
+      - DATABASE_URL="jdbc:postgres//postgres:5432"
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+    ports:
+      - 8080:80
+
+  mongo-cfg-1:
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+  #      placement:
+  #        constraints:
+  #          - node.labels.mongo.role==data1
+
+
+  mongo-cfg-2:
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+  #      placement:
+  #        constraints:
+  #          - node.labels.mongo.role==data2
+
+  mongo-shard-1:
+    image: mongo
+    command: mongod --shardsvr --replSet datars
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+  #      placement:
+  #        constraints:
+  #          - node.labels.mongo.role==data1
+
+  mongo-shard-2:
+    image: mongo
+    command: mongod --shardsvr  --replSet datars
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+  #      placement:
+  #        constraints:
+  #          - node.labels.mongo.role==data2
+
+  mongo-router:
+    image: mongo
+    ports:
+      - 27017:27017
+    command: mongos --configdb cfgrs/mongo-cfg-1:27019,mongo-cfg-1:27019,mongo-cfg-1:27019
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+      replicas: 2
+
+  mongo-express:
+    image: mongo-express
+    networks:
+      - mongo
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+      replicas: 2
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
