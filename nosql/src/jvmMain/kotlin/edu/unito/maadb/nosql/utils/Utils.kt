@@ -2,6 +2,7 @@ package edu.unito.maadb.nosql.utils
 
 import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
+import edu.unito.maadb.core.utils.SpecificSentiment
 import edu.unito.maadb.core.utils.TweetsElaborationTools
 import edu.unito.maadb.core.utils.getTweetElaborationFlow
 import edu.unito.maadb.nosql.dsl.createCollection
@@ -32,39 +33,54 @@ suspend fun populateTweets(
 
 }
 
-data class ListResource(val name: String, val data: List<String>)
+data class ListResource(val type: String, val data: List<String>)
+data class ListResourceWithSentiment(val type: String, val data: List<String>, val sentiment: SpecificSentiment)
+
+data class MapResource(val type: String, val data:Map<String,String>)
 
 suspend fun populateResources(database: CoroutineDatabase) {
 
-    val listResourcesCollection = database.createCollection<ListResource>("listResources")
+    val listResourcesCollection =
+            database.createCollection<ListResource>("listResources")
+
+    val listResourceWithSentimentCollection =
+            database.createCollection<ListResourceWithSentiment>("listResourceWithSentiment")
+
+    val mapResourceCollection =
+            database.createCollection<MapResource>("mapResource")
 
     listResourcesCollection.insertOne(ListResource("punctuation", Resources.PUNCTUATION))
+    listResourcesCollection.insertOne(ListResource("stop_words", Resources.STOPWORDS))
+    listResourcesCollection.insertOne(ListResource("negation_words", Resources.NEGATION_WORDS))
+    mapResourceCollection.insertOne(MapResource("contractions", Resources.CONTRACTIONS))
+    mapResourceCollection.insertOne(MapResource("acronym", Resources.ACRONYMS))
 
-    Resources.STOPWORDS.forEach {
-
-    }
-    Resources.NEGATION_WORDS.forEach {
-
-    }
-    Resources.PUNCTUATION.forEach {
-
-    }
-    Resources.CONTRACTIONS.forEach { (a, b) ->
-
-    }
-    Resources.ACRONYMS.forEach { (a, b) ->
-
-    }
     Resources.LexicalData.Sentiments.Specific.forEach { (sem, data) ->
-        data.EmoSN.forEach { res ->
+        
+        listResourceWithSentimentCollection.insertOne(
+                ListResourceWithSentiment(
+                        "EmoSN",
+                        data.EmoSN,
+                        sem
+                )
+        )
 
-        }
-        data.NRC.forEach { res ->
+        listResourceWithSentimentCollection.insertOne(
+                ListResourceWithSentiment(
+                        "NRC",
+                        data.NRC,
+                        sem
+                )
+        )
 
-        }
-        data.SENTISENSE.forEach { res ->
+        listResourceWithSentimentCollection.insertOne(
+                ListResourceWithSentiment(
+                        "SENTISENSE",
+                        data.SENTISENSE,
+                        sem
+                )
+        )
 
-        }
     }
 }
 

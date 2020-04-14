@@ -15,11 +15,11 @@ suspend inline fun <reified T : Any> CoroutineDatabase.createCollection(
 
 fun CreateCollectionOptions.storageEngineOptions(
     serializer: KBson = KBson(),
-    action: StorageEngineBson.() -> Unit
+    action: StorageEngineSettings.() -> Unit
 ): CreateCollectionOptions =
     storageEngineOptions(
         serializer.stringify(
-            StorageEngineBson.serializer(),
-            StorageEngineBson().apply(action)
+            StorageEngineSettings.serializer(),
+            StorageEngineSettings().apply(action)
         )
     )
