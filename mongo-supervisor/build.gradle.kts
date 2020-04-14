@@ -47,14 +47,14 @@ tasks {
 
         val dockerBuildFolder = file("$buildDir/dockerBuild").absolutePath
 
-        val copyDistTar by registering(Sync::class) {
+        val copyDistTar by registering(Copy::class) {
             dependsOn(distTar)
             group = "docker"
             from(distTar.get().archiveFile.get())
             into(dockerBuildFolder)
         }
 
-        val copyDockerfile by registering(Sync::class) {
+        val copyDockerfile by registering(Copy::class) {
             group = "docker"
             from("$projectDir/Dockerfile")
             into(dockerBuildFolder)
