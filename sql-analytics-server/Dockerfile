@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk
 
 COPY sql-analytics-server.tar sql-analytics-server.tar
 RUN tar -xf sql-analytics-server.tar

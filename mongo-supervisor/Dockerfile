@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk
 
 COPY mongo-supervisor.tar mongo-supervisor.tar
 RUN tar -xf mongo-supervisor.tar
