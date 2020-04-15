@@ -27,6 +27,7 @@ suspend fun checkIfMongoIsUp(host: String = "localhost", port: Int = 27019) =
 @OptIn(ExperimentalTime::class)
 suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
     while (!checkIfMongoIsUp(host, port)) {
+        println("mongodb://$host:$port not yet up, waiting...")
         delay(2.seconds)
     }
 }
@@ -36,7 +37,7 @@ suspend fun mongoEval(host: String, port: Int, builder: StringBuilder.() -> Unit
 
 suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Dispatchers.IO) {
     val commands = arrayOf("mongo", "--host", host, "--port", port.toString(), "--eval", command)
-    print("MONGO EVAL $host:$port | ${commands.joinToString(" ")}")
+    println("MONGO EVAL $host:$port | ${commands.joinToString(" ")}")
     ProcessBuilder("mongo", "--host", host, "--port", port.toString(), "--eval", command)
         .start().waitFor()
 }

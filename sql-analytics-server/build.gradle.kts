@@ -106,7 +106,7 @@ tasks {
                 "buildx",
                 "build",
                 "-t",
-                "lamba92/${rootProject.name}-${project.name}",
+                "lamba92/${rootProject.name}-${project.name}:${project.version}",
                 "--platform=linux/amd64,linux/arm64,linux/arm",
                 dockerBuildFolder,
                 "--push"

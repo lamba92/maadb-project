@@ -64,7 +64,7 @@ services:
       - 8080:80
 
   mongo-supervisor:
-    image: lamba92/maadb-project-mongo-supervisor:1.1.0
+    image: lamba92/maadb-project-mongo-supervisor:realease-test-04
     deploy:
       restart_policy:
         condition: on-failure
