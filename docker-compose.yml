@@ -54,7 +54,7 @@ services:
         condition: on-failure
         delay: 5s
         max_attempts: 3
-        window: 120s
+        window: 15s
       replicas: 2
     environment:
       - DATABASE_URL="jdbc:postgres//postgres:5432"
@@ -62,6 +62,20 @@ services:
       - DATABASE_PASSWORD=postgres
     ports:
       - 8080:80
+
+  mongo-supervisor:
+    image: lamba92/maadb-project-mongo-supervisor:1.1.0
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 15s
+    environment:
+      - CONFIGS=mongo-cfg-1:27019,mongo-cfg-2:27019
+      - SHARDS=mongo-shard-1:27019,mongo-shard-2:27019
+      - CONFIGS_RPL_NAME=cfgrs
+      - SHARDS_RPL_NAME=datars
 
   mongo-cfg-1:
     image: mongo
