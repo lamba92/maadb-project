@@ -1,5 +1,6 @@
 @file:Suppress("UNUSED_VARIABLE")
 
+import com.github.lamba92.gradle.utils.ktor
 import org.gradle.internal.os.OperatingSystem
 import java.io.ByteArrayOutputStream
 
@@ -34,9 +35,10 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
 
-    implementation("io.ktor", "ktor-server-tomcat", ktorVersion)
-    implementation("io.ktor", "ktor-serialization", ktorVersion)
-    implementation("io.ktor", "ktor-locations", ktorVersion)
+    implementation(ktor("server-tomcat", ktorVersion))
+    implementation(ktor("serialization", ktorVersion))
+    implementation(ktor("locations", ktorVersion))
+
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
 }

@@ -9,8 +9,8 @@ kotlin.sourceSets["jvmMain"].dependencies {
     val kBsonVersion: String by project
 
     api(project(":core"))
-    api("org.litote.kmongo:kmongo:$kMongoVersion")
-    api("org.litote.kmongo:kmongo-coroutine:$kMongoVersion")
+//    api("org.litote.kmongo:kmongo:$kMongoVersion")
+    api("org.litote.kmongo:kmongo-coroutine-serialization:$kMongoVersion")
     api("com.github.jershell:kbson:$kBsonVersion")
 
 }

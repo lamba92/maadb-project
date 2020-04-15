@@ -107,8 +107,7 @@ fun <K, V> entriesOf(vararg entries: Pair<K, V>): Set<Map.Entry<K, V>> =
         }
     }.toSet()
 
-@FlowPreview
-@ExperimentalStdlibApi
+@OptIn(ExperimentalStdlibApi::class, FlowPreview::class)
 fun getTweetElaborationFlow(tools: TweetsElaborationTools) = Resources.Tweets.entries.asFlow()
     .flatMapMergeIterable { (sentiment, tweets) ->
         tweets.map { sentiment to it }

@@ -1,3 +1,5 @@
+import com.github.lamba92.gradle.utils.kotlinx
+import com.github.lamba92.gradle.utils.serialization
 import org.gradle.internal.os.OperatingSystem
 import java.io.ByteArrayOutputStream
 
@@ -13,20 +15,22 @@ application {
 
 dependencies {
 
-    val kMongoVersion: String by project
-    val kBsonVersion: String by project
+    val kotlinxSerializationVersion: String by project
+    val coroutinesVersion: String by project
 
     implementation(kotlin("stdlib-jdk8"))
-    api("org.litote.kmongo:kmongo:$kMongoVersion")
-    api("org.litote.kmongo:kmongo-coroutine:$kMongoVersion")
-    api("com.github.jershell:kbson:$kBsonVersion")
+    implementation(serialization("runtime", kotlinxSerializationVersion))
+    implementation(kotlinx("coroutines-core", coroutinesVersion))
 
 }
 
 tasks {
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
     }
     distTar {
         archiveFileName.set(project.name + ".tar")
