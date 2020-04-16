@@ -1,4 +1,4 @@
-FROM openjdk
+FROM lamba92/openjdk8:1.0.0
 
 ARG APP_NAME
 ARG TAR_NAME
