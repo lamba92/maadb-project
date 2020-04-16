@@ -19,7 +19,13 @@ class MaadbApplicationPlugin : Plugin<Project> {
         apply<ApplicationPlugin>()
 
         kotlinJvm.target.compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions {
+                jvmTarget = "1.8"
+
+                @Suppress("SuspiciousCollectionReassignment")
+                freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+
+            }
         }
 
         // Check OS first, if using Win10Home this exec can take a lot of time
@@ -57,15 +63,14 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     dependsOn(copyDistTar, copyDockerfile)
                     group = "docker"
                     commandLine(
-                        "docker",
-                        "buildx",
-                        "build",
-                        "--build-arg APP_NAME=${project.name}",
-                        "--build-arg TAR_NAME=${distTar.archiveFile.get().asFile.name}",
-                        "-t",
-                        "lamba92/${rootProject.name}-${project.name}",
-                        "--platform=linux/amd64,linux/arm64,linux/arm",
-                        dockerBuildFolder
+                            "docker",
+                            "buildx",
+                            "build",
+                            "-t",
+                            "lamba92/${rootProject.name}-${project.name}",
+                            "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name},APP_NAME=${project.name}",
+                            "--platform=linux/amd64,linux/arm64,linux/arm",
+                            dockerBuildFolder
                     )
                 }
 
@@ -77,16 +82,15 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     dependsOn(copyDistTar, copyDockerfile)
                     group = "docker"
                     commandLine(
-                        "docker",
-                        "buildx",
-                        "build",
-                        "--build-arg APP_NAME=${project.name}",
-                        "--build-arg TAR_NAME=${distTar.archiveFile.get().asFile.name}",
-                        "-t",
-                        "lamba92/${rootProject.name}-${project.name}:${project.version}",
-                        "--platform=linux/amd64,linux/arm64,linux/arm",
-                        dockerBuildFolder,
-                        "--push"
+                            "docker",
+                            "buildx",
+                            "build",
+                            "-t",
+                            "lamba92/${rootProject.name}-${project.name}:${project.version}",
+                            "--platform=linux/amd64,linux/arm64,linux/arm",
+                            "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name},APP_NAME=${project.name}",
+                            dockerBuildFolder,
+                            "--push"
                     )
                 }
 
