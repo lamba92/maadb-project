@@ -1,7 +1,7 @@
 @file:Suppress("UNUSED_VARIABLE")
 
 plugins {
-    id("maadb-project-plugin")
+    id("maadb-library-plugin")
     kotlin("plugin.serialization")
 }
 

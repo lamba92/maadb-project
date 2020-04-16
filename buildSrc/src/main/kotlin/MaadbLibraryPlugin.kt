@@ -12,7 +12,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
-open class MaadbProjectPlugin : Plugin<Project> {
+open class MaadbLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
 
@@ -30,6 +30,8 @@ open class MaadbProjectPlugin : Plugin<Project> {
                 compilations.all {
                     kotlinOptions {
                         jvmTarget = "1.8"
+
+                        @Suppress("SuspiciousCollectionReassignment")
                         freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
                     }
                 }
