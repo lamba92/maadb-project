@@ -56,11 +56,11 @@ class MaadbApplicationPlugin : Plugin<Project> {
                 val copyDockerfile by creating(Copy::class) {
                     group = "docker"
                     from(getResource(if ("mongo" in project.name) "Dockerfile-mongo" else "Dockerfile"))
-                        .rename { "Dockerfile" }
+                            .rename { "Dockerfile" }
                     into(dockerBuildFolder)
                 }
 
-                fun commands(withVersion: Boolean = false) = arrayOf(
+                fun commands(withVersion: Boolean = false, addArm32: Boolean = "mongo" !in project.name) = arrayOf(
                     "docker", "buildx", "build", "-t",
                     buildString {
                         append("lamba92/${rootProject.name}-${project.name}")
@@ -69,7 +69,11 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     },
                     "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.nameWithoutExtension}",
                     "--build-arg=APP_NAME=${project.name}",
-                    "--platform=linux/amd64,linux/arm64,linux/arm",
+                    buildString {
+                        append("--platform=linux/amd64,linux/arm64")
+                        if (addArm32)
+                            append(",linux/arm")
+                    },
                     dockerBuildFolder
                 )
 
