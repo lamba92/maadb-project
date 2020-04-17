@@ -3,11 +3,11 @@ FROM lamba92/openjdk8:1.0.0
 ARG APP_NAME
 ARG TAR_NAME
 
-COPY $TAR_NAME $TAR_NAME
-RUN tar -xf $TAR_NAME
-RUN rm $TAR_NAME
+COPY $TAR_NAME.tar $TAR_NAME.tar
+RUN tar -xf $TAR_NAME.tar
+RUN rm $TAR_NAME.tar
 
-ENV BIN_PATH="/$APP_NAME/bin"
+ENV BIN_PATH="/$TAR_NAME/bin"
 ENV PATH="$PATH:$BIN_PATH"
 
 # workaround for https://github.com/moby/moby/issues/34772

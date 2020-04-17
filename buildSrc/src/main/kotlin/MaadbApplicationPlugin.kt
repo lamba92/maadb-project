@@ -59,20 +59,23 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     into(dockerBuildFolder)
                 }
 
+                fun commands(withVersion: Boolean = false) = arrayOf(
+                    "docker", "buildx", "build", "-t",
+                    buildString {
+                        append("lamba92/${rootProject.name}-${project.name}")
+                        if (withVersion)
+                            append(":${project.version}")
+                    },
+                    "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.nameWithoutExtension}",
+                    "--build-arg=APP_NAME=${project.name}",
+                    "--platform=linux/amd64,linux/arm64,linux/arm",
+                    dockerBuildFolder
+                )
+
                 val buildMultiArchImages by creating(Exec::class) {
                     dependsOn(copyDistTar, copyDockerfile)
                     group = "docker"
-                    commandLine(
-                        "docker",
-                        "buildx",
-                        "build",
-                        "-t",
-                        "lamba92/${rootProject.name}-${project.name}",
-                        "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name}",
-                        "--build-arg=APP_NAME=${project.name}",
-                        "--platform=linux/amd64,linux/arm64,linux/arm",
-                        dockerBuildFolder
-                    )
+                    commandLine(*commands())
                 }
 
                 "build" {
@@ -82,35 +85,13 @@ class MaadbApplicationPlugin : Plugin<Project> {
                 val publishMultiArchImagesWithLatestTag by creating(Exec::class) {
                     dependsOn(copyDistTar, copyDockerfile)
                     group = "docker"
-                    commandLine(
-                        "docker",
-                        "buildx",
-                        "build",
-                        "-t",
-                        "lamba92/${rootProject.name}-${project.name}",
-                        "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name}",
-                        "--build-arg=APP_NAME=${project.name}",
-                        "--platform=linux/amd64,linux/arm64,linux/arm",
-                        dockerBuildFolder,
-                        "--push"
-                    )
+                    commandLine(*commands(), "--push")
                 }
 
                 create<Exec>("publishMultiArchImages") {
                     dependsOn(publishMultiArchImagesWithLatestTag)
                     group = "docker"
-                    commandLine(
-                        "docker",
-                        "buildx",
-                        "build",
-                        "-t",
-                        "lamba92/${rootProject.name}-${project.name}:${project.version}",
-                        "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name}",
-                        "--build-arg=APP_NAME=${project.name}",
-                        "--platform=linux/amd64,linux/arm64,linux/arm",
-                        dockerBuildFolder,
-                        "--push"
-                    )
+                    commandLine(*commands(true), "--push")
                 }
 
             }
