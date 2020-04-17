@@ -12,7 +12,7 @@ volumes:
 services:
 
   jupyter-kotlin:
-    image: lamba92/jupyter-kotlin:1.0.0
+    image: lamba92/kotlin-jupyter:1.0.1
     ports:
       - 8888:8888
     volumes:
