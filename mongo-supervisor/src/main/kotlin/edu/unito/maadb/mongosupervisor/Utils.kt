@@ -13,7 +13,9 @@ fun getEnvSplitOrThrow(name: String) =
         ?.map { it.split(":").let { Remote(it[0], it[1].toInt()) } }
         ?: throw IllegalArgumentException("$name missing from environment")
 
-data class Remote(val host: String, val port: Int)
+data class Remote(val host: String, val port: Int) {
+    override fun toString() = "$host:$port"
+}
 
 fun getEnvOrThrow(name: String) =
     System.getenv(name) ?: throw IllegalArgumentException("$name missing from environment")
@@ -27,8 +29,8 @@ suspend fun checkIfMongoIsUp(host: String = "localhost", port: Int = 27019) =
 @OptIn(ExperimentalTime::class)
 suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
     while (!checkIfMongoIsUp(host, port)) {
-        println("mongodb://$host:$port not yet up, waiting...")
-        delay(2.seconds)
+        println("mongodb://$host:$port not yet up, waiting 10 seconds...")
+        delay(10.seconds)
     }
 }
 
@@ -38,8 +40,16 @@ suspend fun mongoEval(host: String, port: Int, builder: StringBuilder.() -> Unit
 suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Dispatchers.IO) {
     val commands = arrayOf("mongo", "--host", host, "--port", port.toString(), "--eval", command)
     println("MONGO EVAL $host:$port | ${commands.joinToString(" ")}")
-    ProcessBuilder("mongo", "--host", host, "--port", port.toString(), "--eval", command)
-        .start().waitFor()
+    with(ProcessBuilder("mongo", "--host", host, "--port", port.toString(), "--eval", command)) {
+        val output = createTempFile()
+        redirectOutput(output)
+        val exitValue = start().exitValue()
+        println("Process output:")
+        output.readLines()
+            .map { "\t $it" }
+            .forEach { println(it) }
+        exitValue
+    }
 }
 
 suspend inline fun initializeReplicaSet(host: String, port: Int, action: ReplicaConfigurationDocument.() -> Unit) {
@@ -72,11 +82,25 @@ suspend fun initializeReplicaSet(
     }
 }
 
-suspend fun initializeShardSet(shards: List<Remote>, replicaSetName: String) =
-    mongoEval(shards.first().host, shards.first().port) {
+suspend fun initializeShardSet(
+    configsReplicaName: String,
+    configs: List<Remote>,
+    replicaSetName: String,
+    shards: List<Remote>
+): Process {
+    val mongosProcess = withContext(Dispatchers.IO) {
+        ProcessBuilder("mongos", "--configdb", "$configsReplicaName/${configs.joinToString(",")}")
+            .start()
+    }
+    waitUntilMongoIsUp(port = 27017)
+    mongoEval("localhost", 2017) {
         append("sh.addShard(\"")
         append(replicaSetName)
         append("/")
         append(shards.joinToString(",") { "${it.host}:${it.port}" })
         append("\")")
     }
+
+    return mongosProcess
+}
+

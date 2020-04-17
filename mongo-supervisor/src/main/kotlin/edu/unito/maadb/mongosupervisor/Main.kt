@@ -1,5 +1,9 @@
 package edu.unito.maadb.mongosupervisor
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.system.exitProcess
+
 
 suspend fun main() {
 
@@ -11,7 +15,11 @@ suspend fun main() {
     initializeReplicaSet(configs, configsReplicaName, true)
     initializeReplicaSet(shards, shardsReplicaName)
 
-    initializeShardSet(shards, shardsReplicaName)
+    val process = initializeShardSet(configsReplicaName, configs, shardsReplicaName, shards)
+
+    exitProcess(withContext(Dispatchers.IO) {
+        process.waitFor()
+    })
 
 }
 
