@@ -55,7 +55,8 @@ class MaadbApplicationPlugin : Plugin<Project> {
 
                 val copyDockerfile by creating(Copy::class) {
                     group = "docker"
-                    from(getResource("Dockerfile")).rename { "Dockerfile" }
+                    from(getResource(if ("mongo" in project.name) "Dockerfile-mongo" else "Dockerfile"))
+                        .rename { "Dockerfile" }
                     into(dockerBuildFolder)
                 }
 

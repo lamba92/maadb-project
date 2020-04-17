@@ -1,0 +1,21 @@
+FROM mongo
+
+ARG APP_NAME
+ARG TAR_NAME
+
+# fix for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199#23
+RUN mkdir -p /usr/share/man/man1
+
+RUN apt install -yqq openjdk-8-jdk humanity-icon-theme-
+RUN apt clean
+
+COPY $TAR_NAME.tar $TAR_NAME.tar
+RUN tar -xf $TAR_NAME.tar
+RUN rm $TAR_NAME.tar
+
+ENV BIN_PATH="/$TAR_NAME/bin"
+ENV PATH="$PATH:$BIN_PATH"
+
+# workaround for https://github.com/moby/moby/issues/34772
+ENV RUN_COMMAND=$APP_NAME
+CMD $RUN_COMMAND
