@@ -7,7 +7,9 @@ COPY $TAR_NAME $TAR_NAME
 RUN tar -xf $TAR_NAME
 RUN rm $TAR_NAME
 
-ENV BIN_PATH="/$TAR_NAME/bin"
-ENV PATH="${PATH}:$BIN_PATH"
+ENV BIN_PATH="$TAR_NAME/bin"
+ENV PATH="$PATH:$BIN_PATH"
 
-CMD $APP_NAME
+# workaround for https://github.com/moby/moby/issues/34772
+ENV RUN_COMMAND=$APP_NAME
+CMD $RUN_COMMAND

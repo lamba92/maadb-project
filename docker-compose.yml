@@ -12,7 +12,7 @@ volumes:
 services:
 
   jupyter-kotlin:
-    image: lamba92/jupyter-kotlin:1.0.1
+    image: lamba92/jupyter-kotlin:1.0.0
     ports:
       - 8888:8888
     volumes:
@@ -48,7 +48,7 @@ services:
         target: /var/lib/postgresql/data
 
   sql-analitycs-server:
-    image: lamba92/maadb-project-sql-analytics-server:realease-test-04
+    image: lamba92/maadb-project-sql-analytics-server:1.1.0
     deploy:
       restart_policy:
         condition: on-failure
@@ -64,7 +64,7 @@ services:
       - 8080:80
 
   mongo-supervisor:
-    image: lamba92/maadb-project-mongo-supervisor:realease-test-04
+    image: lamba92/maadb-project-mongo-supervisor:1.1.0
     deploy:
       restart_policy:
         condition: on-failure
