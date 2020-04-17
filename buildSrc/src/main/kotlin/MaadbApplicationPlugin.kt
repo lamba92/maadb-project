@@ -79,8 +79,25 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     dependsOn(buildMultiArchImages)
                 }
 
-                create<Exec>("publishMultiArchImages") {
+                val publishMultiArchImagesWithLatestTag by creating(Exec::class) {
                     dependsOn(copyDistTar, copyDockerfile)
+                    group = "docker"
+                    commandLine(
+                        "docker",
+                        "buildx",
+                        "build",
+                        "-t",
+                        "lamba92/${rootProject.name}-${project.name}",
+                        "--build-arg=TAR_NAME=${distTar.archiveFile.get().asFile.name}",
+                        "--build-arg=APP_NAME=${project.name}",
+                        "--platform=linux/amd64,linux/arm64,linux/arm",
+                        dockerBuildFolder,
+                        "--push"
+                    )
+                }
+
+                create<Exec>("publishMultiArchImages") {
+                    dependsOn(publishMultiArchImagesWithLatestTag)
                     group = "docker"
                     commandLine(
                         "docker",

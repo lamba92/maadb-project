@@ -48,7 +48,7 @@ services:
         target: /var/lib/postgresql/data
 
   sql-analitycs-server:
-    image: lamba92/maadb-project-sql-analytics-server:1.1.0
+    image: lamba92/maadb-project-sql-analytics-server
     deploy:
       restart_policy:
         condition: on-failure
@@ -64,7 +64,7 @@ services:
       - 8080:80
 
   mongo-supervisor:
-    image: lamba92/maadb-project-mongo-supervisor:1.1.0
+    image: lamba92/maadb-project-mongo-supervisor
     deploy:
       restart_policy:
         condition: on-failure
