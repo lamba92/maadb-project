@@ -99,9 +99,9 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-        placement:
-          constraints:
-            - node.labels.mongo.role==data2
+      placement:
+        constraints:
+          - node.labels.mongo.role==data2
 
   mongo-shard-1:
     image: mongo
@@ -113,9 +113,9 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-        placement:
-          constraints:
-            - node.labels.mongo.role==data1
+      placement:
+        constraints:
+          - node.labels.mongo.role==data1
 
   mongo-shard-2:
     image: mongo
@@ -127,9 +127,9 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-        placement:
-          constraints:
-            - node.labels.mongo.role==data2
+      placement:
+        constraints:
+          - node.labels.mongo.role==data2
 
   mongo-express:
     image: mongo-express

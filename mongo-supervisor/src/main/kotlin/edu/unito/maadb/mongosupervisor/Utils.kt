@@ -43,7 +43,7 @@ suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Di
     with(ProcessBuilder("mongo", "--host", host, "--port", port.toString(), "--eval", command)) {
         val output = createTempFile()
         redirectOutput(output)
-        val exitValue = start().exitValue()
+        val exitValue = start().waitFor()
         println("Process output:")
         output.readLines()
             .map { "\t $it" }
