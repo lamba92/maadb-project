@@ -32,6 +32,7 @@ suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
         println("mongodb://$host:$port not yet up, waiting 10 seconds...")
         delay(10.seconds)
     }
+    println("Host $host:$port is up")
 }
 
 suspend fun mongoEval(host: String, port: Int, builder: StringBuilder.() -> Unit) =
@@ -72,7 +73,6 @@ suspend fun initializeReplicaSet(
         members {
             remotes.forEachIndexed { index, (memberHost, memberPort) ->
                 waitUntilMongoIsUp(memberHost, memberPort)
-                println("host $memberHost:$memberPort is up")
                 add {
                     id = index
                     host = "$memberHost:$memberPort"
@@ -89,10 +89,19 @@ suspend fun initializeShardSet(
     shards: List<Remote>
 ): Process {
     val mongosProcess = withContext(Dispatchers.IO) {
-        ProcessBuilder("mongos", "--configdb", "$configsReplicaName/${configs.joinToString(",")}")
+        ProcessBuilder(
+            "mongos",
+            "--configdb",
+            "$configsReplicaName/${configs.joinToString(",")}",
+            "--port",
+            "27017"
+        )
+            .inheritIO()
             .start()
     }
+
     waitUntilMongoIsUp(port = 27017)
+
     mongoEval("localhost", 2017) {
         append("sh.addShard(\"")
         append(replicaSetName)
