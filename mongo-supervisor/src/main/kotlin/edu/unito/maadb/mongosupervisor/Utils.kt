@@ -101,7 +101,7 @@ suspend fun initializeShardSet(
 
     waitUntilMongoIsUp(port = 27017)
 
-    mongoEval("localhost", 2017) {
+    mongoEval("localhost", 27017) {
         append("sh.addShard(\"")
         append(replicaSetName)
         append("/")

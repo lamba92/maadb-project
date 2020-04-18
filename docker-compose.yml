@@ -76,7 +76,7 @@ services:
       - CONFIGS_RPL_NAME=cfgrs
       - SHARDS_RPL_NAME=datars
     ports:
-      - 27017:2017
+      - 27017:27017
 
   mongo-cfg-1:
     image: mongo
