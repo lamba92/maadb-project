@@ -93,8 +93,7 @@ suspend fun initializeShardSet(
             "mongos",
             "--configdb",
             "$configsReplicaName/${configs.joinToString(",")}",
-            "--port",
-            "27017"
+            "--bind_ip_all"
         )
             .inheritIO()
             .start()
