@@ -45,6 +45,8 @@ services:
     image: lamba92/maadb-project-sql-analytics-server
     networks:
       - postgres-net
+    depends_on:
+      - postgres
     deploy:
       restart_policy:
         condition: on-failure
@@ -52,7 +54,6 @@ services:
         max_attempts: 3
         window: 15s
       mode: global
-
     environment:
       - DATABASE_URL="jdbc:postgres//postgres:5432"
       - DATABASE_USER=postgres
@@ -87,24 +88,27 @@ services:
 
   mongo-cfg-1:
     image: mongo
-    command: mongod --configsvr --replSet cfgrs
+    command: mongod --configsvr --bind_ip_all --replSet cfgrs
     networks:
       - mongo-net
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.stats()"]
+      test: ["CMD", "mongo", "--port", "27019", "--eval", "db.stats()"]
     deploy:
       restart_policy:
         delay: 5s
         max_attempts: 5
         window: 10s
+      placement:
+        constraints:
+          - node.labels.mongo.role==data1
 
   mongo-cfg-2:
     image: mongo
-    command: mongod --configsvr --replSet cfgrs
+    command: mongod --configsvr --bind_ip_all --replSet cfgrs
     networks:
       - mongo-net
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.stats()"]
+      test: ["CMD", "mongo", "--port", "27019", "--eval", "db.stats()"]
     deploy:
       restart_policy:
         delay: 5s
@@ -116,11 +120,11 @@ services:
 
   mongo-shard-1:
     image: mongo
-    command: mongod --shardsvr --replSet datars
+    command: mongod --shardsvr --bind_ip_all --replSet datars
     networks:
       - mongo-net
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.stats()"]
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
       restart_policy:
         delay: 5s
@@ -132,11 +136,11 @@ services:
 
   mongo-shard-2:
     image: mongo
-    command: mongod --shardsvr  --replSet datars
+    command: mongod --shardsvr --bind_ip_all --replSet datars
     networks:
       - mongo-net
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.stats()"]
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
       restart_policy:
         delay: 5s
@@ -150,6 +154,8 @@ services:
     image: mongo-express
     networks:
       - mongo-net
+    depends_on:
+      - mongo-supervisor
     deploy:
       restart_policy:
         delay: 5s

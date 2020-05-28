@@ -3,10 +3,7 @@ package edu.unito.maadb.sql.utils
 import edu.unito.maadb.core.utils.SpecificSentiment
 import edu.unito.maadb.core.utils.TweetsElaborationTools
 import edu.unito.maadb.sql.daos.TweetEntity
-import edu.unito.maadb.sql.tables.TweetEmojisTable
-import edu.unito.maadb.sql.tables.TweetEmoticonsTable
-import edu.unito.maadb.sql.tables.TweetHashtagsTable
-import edu.unito.maadb.sql.tables.TweetsTable
+import edu.unito.maadb.sql.tables.*
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
@@ -15,16 +12,20 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 @OptIn(ExperimentalStdlibApi::class, FlowPreview::class)
 suspend fun populateDatabase(
-    database: Database,
-    tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
+        database: Database,
+        tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
 ): Map<SpecificSentiment, List<TweetEntity>> {
 
     newSuspendedTransaction(db = database) {
         SchemaUtils.createMissingTablesAndColumns(
-            TweetsTable,
-            TweetEmojisTable,
-            TweetEmoticonsTable,
-            TweetHashtagsTable
+                TweetsTable,
+                TweetEmojisTable,
+                TweetEmoticonsTable,
+                TweetHashtagsTable,
+                SimpleResourcesTable,
+                WithSentimentResourcesTable,
+                SimplePairResourcesTable,
+                WithSentimentPairResourcesTable
         )
     }
 
@@ -34,12 +35,12 @@ suspend fun populateDatabase(
 }
 
 fun populateDatabaseBlocking(
-    database: Database,
-    tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
+        database: Database,
+        tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
 ) = runBlocking {
     populateDatabase(
-        database,
-        tools
+            database,
+            tools
     )
 }
 

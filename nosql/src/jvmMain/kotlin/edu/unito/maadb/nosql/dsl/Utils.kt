@@ -1,7 +1,11 @@
 package edu.unito.maadb.nosql.dsl
 
-import com.github.jershell.kbson.KBson
+import com.github.jershell.kbson.*
 import com.mongodb.client.model.CreateCollectionOptions
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import org.bson.Document
+import org.bson.conversions.Bson
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
@@ -14,12 +18,12 @@ suspend inline fun <reified T : Any> CoroutineDatabase.createCollection(
 }
 
 fun CreateCollectionOptions.storageEngineOptions(
-    serializer: KBson = KBson(),
-    action: StorageEngineSettings.() -> Unit
+        serializer: Json = Json(JsonConfiguration.Stable.copy(prettyPrint = true)),
+        action: StorageEngineSettings.() -> Unit
 ): CreateCollectionOptions =
     storageEngineOptions(
-        serializer.stringify(
+        Document.parse(serializer.stringify(
             StorageEngineSettings.serializer(),
             StorageEngineSettings().apply(action)
-        )
+        ))
     )

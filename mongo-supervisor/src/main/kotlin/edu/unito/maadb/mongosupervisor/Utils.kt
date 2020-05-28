@@ -9,22 +9,22 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
 fun getEnvSplitOrThrow(name: String) =
-    System.getenv(name)?.split(",")
-        ?.map { it.split(":").let { Remote(it[0], it[1].toInt()) } }
-        ?: throw IllegalArgumentException("$name missing from environment")
+        System.getenv(name)?.split(",")
+                ?.map { it.split(":").let { Remote(it[0], it[1].toInt()) } }
+                ?: throw IllegalArgumentException("$name missing from environment")
 
 data class Remote(val host: String, val port: Int) {
     override fun toString() = "$host:$port"
 }
 
 fun getEnvOrThrow(name: String) =
-    System.getenv(name) ?: throw IllegalArgumentException("$name missing from environment")
+        System.getenv(name) ?: throw IllegalArgumentException("$name missing from environment")
 
 inline fun ReplicaConfigurationDocument.members(action: ReplicaMembersBuilder.() -> Unit) =
-    ReplicaMembersBuilder().apply(action).also { members = it.build() }
+        ReplicaMembersBuilder().apply(action).also { members = it.build() }
 
 suspend fun checkIfMongoIsUp(host: String = "localhost", port: Int = 27019) =
-    mongoEval(host, port, "db.stats()") == 0
+        mongoEval(host, port, "db.stats()") == 0
 
 @OptIn(ExperimentalTime::class)
 suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
@@ -35,10 +35,10 @@ suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
     println("Host $host:$port is up")
 }
 
-suspend fun mongoEval(host: String, port: Int, builder: StringBuilder.() -> Unit) =
-    mongoEval(host, port, buildString(builder))
+suspend fun mongoEval(host: String = "localhost", port: Int = 27017, builder: StringBuilder.() -> Unit) =
+        mongoEval(host, port, buildString(builder))
 
-suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Dispatchers.IO) {
+suspend fun mongoEval(host: String = "localhost", port: Int = 27017, command: String) = withContext(Dispatchers.IO) {
     val commands = arrayOf("mongo", "--host", host, "--port", port.toString(), "--eval", command)
     println("MONGO EVAL $host:$port | ${commands.joinToString(" ")}")
     with(ProcessBuilder("mongo", "--host", host, "--port", port.toString(), "--eval", command)) {
@@ -47,8 +47,8 @@ suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Di
         val exitValue = start().waitFor()
         println("Process output:")
         output.readLines()
-            .map { "\t $it" }
-            .forEach { println(it) }
+                .map { "\t $it" }
+                .forEach { println(it) }
         exitValue
     }
 }
@@ -56,15 +56,15 @@ suspend fun mongoEval(host: String, port: Int, command: String) = withContext(Di
 suspend inline fun initializeReplicaSet(host: String, port: Int, action: ReplicaConfigurationDocument.() -> Unit) {
     val serializer = Json(JsonConfiguration.Stable.copy(prettyPrint = true))
     val doc = ReplicaConfigurationDocument().apply(action)
-        .let { serializer.stringify(ReplicaConfigurationDocument.serializer(), it) }
+            .let { serializer.stringify(ReplicaConfigurationDocument.serializer(), it) }
     println("initializing replica set: \n${doc}")
     mongoEval(host, port, "rs.initiate($doc)")
 }
 
 suspend fun initializeReplicaSet(
-    remotes: List<Remote>,
-    replicaSetName: String,
-    enableConfigurationServer: Boolean = false
+        remotes: List<Remote>,
+        replicaSetName: String,
+        enableConfigurationServer: Boolean = false
 ) {
     val (mainHost, mainPort) = remotes.first()
     initializeReplicaSet(mainHost, mainPort) init@{
@@ -83,20 +83,20 @@ suspend fun initializeReplicaSet(
 }
 
 suspend fun initializeShardSet(
-    configsReplicaName: String,
-    configs: List<Remote>,
-    replicaSetName: String,
-    shards: List<Remote>
+        configsReplicaName: String,
+        configs: List<Remote>,
+        replicaSetName: String,
+        shards: List<Remote>
 ): Process {
     val mongosProcess = withContext(Dispatchers.IO) {
         ProcessBuilder(
-            "mongos",
-            "--configdb",
-            "$configsReplicaName/${configs.joinToString(",")}",
-            "--bind_ip_all"
+                "mongos",
+                "--configdb",
+                "$configsReplicaName/${configs.joinToString(",")}",
+                "--bind_ip_all"
         )
-            .inheritIO()
-            .start()
+                .inheritIO()
+                .start()
     }
 
     waitUntilMongoIsUp(port = 27017)

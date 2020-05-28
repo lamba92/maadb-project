@@ -8,11 +8,11 @@ import org.postgresql.Driver
 @FlowPreview
 @ExperimentalStdlibApi
 suspend fun main() {
-    val db = Database.connect(
-        url = "jdbc:postgresql://192.168.1.158/maadb",
-        driver = Driver::class.qualifiedName!!,
-        user = "postgres",
-        password = "postgres"
-    )
-    populateDatabase(db)
+  val db =
+      Database.connect(
+          "jdbc:postgresql://192.168.1.158:5432/",
+          user = "postgres",
+          password = "postgres"
+      )
+  populateDatabase(db)
 }
