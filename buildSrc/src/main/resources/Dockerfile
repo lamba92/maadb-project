@@ -1,4 +1,4 @@
-FROM lamba92/openjdk8:1.0.0
+FROM adoptopenjdk:8u252-b09-jdk-hotspot-bionic
 
 ARG APP_NAME
 ARG TAR_NAME
