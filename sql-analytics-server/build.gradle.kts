@@ -3,7 +3,7 @@
 import com.github.lamba92.gradle.utils.ktor
 
 plugins {
-    id("maadb-application-plugin")
+    `maadb-application-plugin`
     kotlin("plugin.serialization")
 }
 

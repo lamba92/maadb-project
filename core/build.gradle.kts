@@ -3,7 +3,7 @@ import com.github.lamba92.gradle.utils.lamba
 import com.github.lamba92.gradle.utils.serialization
 
 plugins {
-    id("maadb-library-plugin")
+    `maadb-library-plugin`
     kotlin("plugin.serialization")
 }
 

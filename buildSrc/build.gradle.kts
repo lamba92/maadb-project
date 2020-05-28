@@ -2,15 +2,18 @@ plugins {
     `kotlin-dsl`
 }
 
-gradlePlugin.plugins.create("maadb-library-plugin") {
-    id = "maadb-library-plugin"
-    implementationClass = "MaadbLibraryPlugin"
+gradlePlugin {
+    plugins {
+        create("maadb-library-plugin") {
+            id = "maadb-library-plugin"
+            implementationClass = "MaadbLibraryPlugin"
+        }
+        create("maadb-application-plugin") {
+            id = "maadb-application-plugin"
+            implementationClass = "MaadbApplicationPlugin"
+        }
+    }
 }
-gradlePlugin.plugins.create("maadb-application-plugin") {
-    id = "maadb-application-plugin"
-    implementationClass = "MaadbApplicationPlugin"
-}
-
 repositories {
     jcenter()
     mavenCentral()
@@ -32,4 +35,5 @@ dependencies {
     api("com.github.lamba92", "lamba-gradle-utils", lambaGradleUtilsVersion)
     api("com.github.lamba92", "kresourceloader", resLoaderVersion)
     api("com.google.guava", "guava", guavaVersion)
+
 }
