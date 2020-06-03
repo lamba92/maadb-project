@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 fun ElaboratedTweet.toEntity(): TweetEntity {
-    val tweetEntity = TweetEntity.new(id) {
+    val tweetEntity = TweetEntity.new(_id) {
         originalTweet = this@toEntity.originalTweet
         sentiment = this@toEntity.sentiment
         tokenizedTweet = this@toEntity.tokenizedTweet

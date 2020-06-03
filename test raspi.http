@@ -2,3 +2,5 @@ GET http://localhost:80/data/tweets/bySpecificSentiment/anger?pageSize=10&page=1
 Accept: application/json
 
 ###
+GET http://localhost:80/statistics/tweets/bySpecificSentiment/anger
+Accept: application/json

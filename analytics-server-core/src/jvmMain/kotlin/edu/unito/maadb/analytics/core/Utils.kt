@@ -1,4 +1,4 @@
-package edu.unito.maadb.sql.analytics.server
+package edu.unito.maadb.analytics.core
 
 import edu.unito.maadb.core.utils.SpecificSentiment
 import io.ktor.locations.KtorExperimentalLocationsAPI

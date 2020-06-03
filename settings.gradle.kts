@@ -19,6 +19,8 @@ include(
     ":sql",
     ":nosql",
     ":mongo-supervisor",
+    ":analytics-server-core",
     ":sql-analytics-server",
-    ":sql-analytics-core"
+    ":nosql-analytics-server",
+    ":analytics-core"
 )

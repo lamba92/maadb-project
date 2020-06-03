@@ -2,6 +2,7 @@ package edu.unito.maadb.core.utils
 
 import edu.unito.maadb.core.utils.SpecificSentiment.*
 
+
 enum class GenericSentiment {
     POSITIVE, NEGATIVE
 }

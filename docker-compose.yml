@@ -55,7 +55,7 @@ services:
         window: 15s
       mode: global
     environment:
-      - DATABASE_URL="jdbc:postgres//postgres:5432"
+      - DATABASE_URL="jdbc:postgres//postgres:5432/"
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
     ports:
