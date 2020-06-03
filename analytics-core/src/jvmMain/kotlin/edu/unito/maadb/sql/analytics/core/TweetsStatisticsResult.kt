@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 data class TweetsStatisticsResult(
     val sentiment: SpecificSentiment,
     val wordsWithOccurrences: Map<String, Int>,
-    val newWordsNotInResources: List<String>
+    val newWordsNotInResources: List<String>,
+    val timeInMilliseconds: Long
 )
 
 @Serializable
 data class StatisticsResult(
     val sentiment: SpecificSentiment,
-    val dataWithOccurrences: Map<String, Int>
+    val dataWithOccurrences: Map<String, Int>,
+    val timeInMilliseconds: Long
 )
