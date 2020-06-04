@@ -10,6 +10,7 @@ kotlin.sourceSets {
         dependencies {
             val exposedVersion: String by project
             val logbackVersion: String by project
+            val postgresDriversVersion: String by project
 
             implementation(kotlin("stdlib-jdk8"))
             api(kotlin("reflect"))
@@ -20,13 +21,8 @@ kotlin.sourceSets {
             api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
             api("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
             api("ch.qos.logback:logback-classic:$logbackVersion")
-
-        }
-    }
-    jvmTest {
-        dependencies {
-            val postgresDriversVersion: String by project
             implementation("org.postgresql:postgresql:$postgresDriversVersion")
+
         }
     }
 }

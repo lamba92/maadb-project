@@ -22,5 +22,7 @@ include(
     ":analytics-server-core",
     ":sql-analytics-server",
     ":nosql-analytics-server",
-    ":analytics-core"
+    ":analytics-core",
+    "sql-data-feeder",
+    "nosql-data-feeder"
 )
