@@ -60,9 +60,8 @@ data class PagedData<T>(
 fun defaultWordCloud(wordz: Map<String, Int>) = wordCloud {
     width = 1000
     height = 1000
-    padding = 2
     background = CircleBackground(500)
-    fontScalar = SqrtFontScalar(10, 40)
+    fontScalar = SqrtFontScalar(5, 100)
     colorPalette {
         color(0x4055F1)
         color(0x408DF1)
@@ -71,7 +70,12 @@ fun defaultWordCloud(wordz: Map<String, Int>) = wordCloud {
         color(0x40D3F1)
         color(0xFFFFFF)
     }
-    words = wordz
+    words = wordz.entries.sortedByDescending { it.value }.take(200).toMap()
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+private fun <T, R> Iterable<Map.Entry<T, R>>.toMap() = buildMap<T, R> {
+    this@toMap.forEach { (t, r) -> put(t, r) }
 }
 
 fun wordCloud(action: WordCloudBuilder.() -> Unit): WordCloud =

@@ -10,8 +10,9 @@ import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
 import it.lamba.utils.getResource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
@@ -20,23 +21,24 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 @OptIn(ExperimentalTime::class)
-object Datasource : DatasourceElaborator {
+abstract class AbstractMongoDBDatasource : DatasourceElaborator {
 
-  data class StatsReduceResult(val word: String, val occurrences: Int)
+  @Serializable
+  data class StatsReduceResult(
+      @SerialName("_id") val word: String,
+      @SerialName("value") val occurrences: Int
+  )
 
-  private val tweetsCollection = KMongo.createClient(System.getenv("MONGO_URL") ?: "mongodb://192.168.1.158")
-      .getDatabase(System.getenv("MONGO_DB_NAME") ?: "maadb")
-      .coroutine
-      .getCollection<ElaboratedTweet>("tweets")
+  protected abstract val tweetsCollection: CoroutineCollection<ElaboratedTweet>
 
   override suspend fun statsTweets(sentiment: SpecificSentiment): TweetsStatisticsResult {
     val (data, duration) = measureTimedValue {
       val wordsCounted = tweetsCollection.mapReduce<StatsReduceResult>(
-              getResource("statsTweetMap.js")
-                  .readText()
-                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
-              getResource("statsReduce.js").readText()
-          )
+          getResource("statsTweetMap.js")
+              .readText()
+              .replace("%%%SENTIMENT%%%", sentiment.toString()),
+          getResource("statsReduce.js").readText()
+      )
           .toList()
           .associate { it.word to it.occurrences }
 
@@ -56,11 +58,11 @@ object Datasource : DatasourceElaborator {
   override suspend fun statsHashtags(sentiment: SpecificSentiment): StatisticsResult {
     val (hashtagsCounted, duration) = measureTimedValue {
       tweetsCollection.mapReduce<StatsReduceResult>(
-              getResource("statsHashtagsMap.js")
-                  .readText()
-                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
-              getResource("statsReduce.js").readText()
-          )
+          getResource("statsHashtagsMap.js")
+              .readText()
+              .replace("%%%SENTIMENT%%%", sentiment.toString()),
+          getResource("statsReduce.js").readText()
+      )
           .toList()
           .associate { it.word to it.occurrences }
     }
@@ -70,11 +72,11 @@ object Datasource : DatasourceElaborator {
   override suspend fun statsEmoticons(sentiment: SpecificSentiment): StatisticsResult {
     val (emoticonsCounted, duration) = measureTimedValue {
       tweetsCollection.mapReduce<StatsReduceResult>(
-              getResource("statsEmoticonsMap.js")
-                  .readText()
-                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
-              getResource("statsReduce.js").readText()
-          )
+          getResource("statsEmoticonsMap.js")
+              .readText()
+              .replace("%%%SENTIMENT%%%", sentiment.toString()),
+          getResource("statsReduce.js").readText()
+      )
           .toList()
           .associate { it.word to it.occurrences }
     }
@@ -84,11 +86,11 @@ object Datasource : DatasourceElaborator {
   override suspend fun statsEmojis(sentiment: SpecificSentiment): StatisticsResult {
     val (emojisCounted, duration) = measureTimedValue {
       tweetsCollection.mapReduce<StatsReduceResult>(
-              getResource("statsEmojisMap.js")
-                  .readText()
-                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
-              getResource("statsReduce.js").readText()
-          )
+          getResource("statsEmojisMap.js")
+              .readText()
+              .replace("%%%SENTIMENT%%%", sentiment.toString()),
+          getResource("statsReduce.js").readText()
+      )
           .toList()
           .associate { it.word to it.occurrences }
     }
@@ -112,4 +114,14 @@ object Datasource : DatasourceElaborator {
     }
     PagedData(data.await(), page, pageSize, totalPages.await())
   }
+}
+
+@OptIn(ExperimentalTime::class)
+object Datasource : AbstractMongoDBDatasource() {
+
+  override val tweetsCollection = KMongo.createClient(System.getenv("MONGO_URL") ?: "mongodb://192.168.1.158:27017")
+      .getDatabase(System.getenv("MONGO_DB_NAME") ?: "maadb")
+      .coroutine
+      .getCollection<ElaboratedTweet>("tweets")
+
 }

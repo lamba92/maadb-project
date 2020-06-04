@@ -62,11 +62,11 @@ services:
       - 8080:80
 
   nosql-analitycs-server:
-    image: lamba92/maadb-project-sql-analytics-server
+    image: lamba92/maadb-project-nosql-analytics-server
     networks:
-      - postgres-net
+      - mongo-net
     depends_on:
-      - postgres
+      - mongo-supervisor
     deploy:
       restart_policy:
         condition: on-failure
@@ -75,9 +75,8 @@ services:
         window: 15s
       mode: global
     environment:
-      - DATABASE_URL="jdbc:postgres//postgres:5432/"
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
+      - MONGO_URL="mongodb://mongo-supervisor:27017"
+      - MONGO_DB_NAME=maadb
     ports:
       - 8080:80
 
@@ -88,8 +87,16 @@ services:
     depends_on:
       - mongo-cfg-1
       - mongo-cfg-2
-      - mongo-shard-1
-      - mongo-shard-2
+      - ms1
+      - ms2
+      - ms3
+      - ms4
+      - ms5
+      - ms6
+      - ms7
+      - ms8
+      - ms9
+      - ms10
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.stats()"]
     deploy:
@@ -100,7 +107,7 @@ services:
         window: 15s
     environment:
       - CONFIGS=mongo-cfg-1:27019,mongo-cfg-2:27019
-      - SHARDS=mongo-shard-1:27018,mongo-shard-2:27018
+      - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018,ms5:27018,ms6:27018,ms7:27018,ms8:27018,ms9:27018,ms10:27018
       - CONFIGS_RPL_NAME=cfgrs
       - SHARDS_RPL_NAME=datars
     ports:
@@ -138,7 +145,7 @@ services:
         constraints:
           - node.labels.mongo.role==data2
 
-  mongo-shard-1:
+  ms1:
     image: mongo
     command: mongod --shardsvr --bind_ip_all --replSet datars
     networks:
@@ -150,11 +157,8 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-      placement:
-        constraints:
-          - node.labels.mongo.role==data1
 
-  mongo-shard-2:
+  ms2:
     image: mongo
     command: mongod --shardsvr --bind_ip_all --replSet datars
     networks:
@@ -166,9 +170,110 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-      placement:
-        constraints:
-          - node.labels.mongo.role==data2
+
+  ms3:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms4:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms5:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms6:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms7:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms8:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms9:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
+
+  ms10:
+    image: mongo
+    command: mongod --shardsvr --bind_ip_all --replSet datars
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 5
+        window: 10s
 
   mongo-express:
     image: mongo-express

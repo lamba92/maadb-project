@@ -6,10 +6,8 @@ import edu.unito.maadb.analytics.core.merge
 import edu.unito.maadb.core.ElaboratedTweet
 import edu.unito.maadb.core.Resources
 import edu.unito.maadb.core.utils.SpecificSentiment
-import edu.unito.maadb.sql.analytics.core.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import edu.unito.maadb.sql.analytics.core.StatisticsResult
+import edu.unito.maadb.sql.analytics.core.TweetsStatisticsResult
 import edu.unito.maadb.sql.daos.TweetEmojiEntity
 import edu.unito.maadb.sql.daos.TweetEmoticonEntity
 import edu.unito.maadb.sql.daos.TweetEntity
@@ -22,11 +20,10 @@ import edu.unito.maadb.sql.utils.toModel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import java.sql.Connection
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.math.ceil
-import kotlin.system.measureTimeMillis
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 @OptIn(ExperimentalTime::class)
@@ -34,13 +31,11 @@ object Datasource : DatasourceElaborator {
 
   val db by lazy {
     Database.connect(
-        url = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://192.168.1.158:5432/",
+        url = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://192.168.1.159:5432/",
         user = System.getenv("DATABASE_USER") ?: "postgres",
-        password = System.getenv("DATABASE_PASSWORD") ?: "postgres",
+        password = System.getenv("DATABASE_PASSWORD") ?: "mysecretpassword",
         driver = org.postgresql.Driver::class.qualifiedName!!
-    ).also {
-      TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-    }
+    )
   }
 
   override suspend fun statsTweets(sentiment: SpecificSentiment): TweetsStatisticsResult {

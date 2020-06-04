@@ -7,17 +7,10 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-// workaround for https://youtrack.jetbrains.com/issue/KT-38165
-val copySourcesWorkaround by tasks.creating(Sync::class) {
-    from("$rootDir/core/src/jvmMain/resources")
-    into("$buildDir/workarounds/resources")
-}
+
 
 kotlin {
 
-    jvm {
-        compilations["main"].compileKotlinTask.dependsOn(copySourcesWorkaround)
-    }
     sourceSets {
 
         val ktorVersion: String by project
@@ -25,7 +18,6 @@ kotlin {
         val kumoVersion: String by project
 
         jvmMain {
-            resources.srcDir(copySourcesWorkaround.destinationDir)
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
 

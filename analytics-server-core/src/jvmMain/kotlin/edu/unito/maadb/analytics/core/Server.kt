@@ -34,7 +34,7 @@ fun getServer(datasource: DatasourceElaborator) = embeddedServer(Tomcat) {
     install(Locations)
 
     routing {
-        route("worldclouds") {
+        route("wordClouds") {
             route("tweets") {
                 get<SentimentLocation> { (sentiment) ->
                     val wc = defaultWordCloud(datasource.statsTweets(sentiment).wordsWithOccurrences)
