@@ -1,5 +1,8 @@
 package edu.unito.maadb.analytics.core
 
+import com.kennycason.kumo.WordCloud
+import com.kennycason.kumo.bg.CircleBackground
+import com.kennycason.kumo.font.scale.SqrtFontScalar
 import edu.unito.maadb.core.utils.SpecificSentiment
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
@@ -53,3 +56,26 @@ data class PagedData<T>(
     val pageSize: Int,
     val totalPages: Int
 )
+
+fun defaultWordCloud(wordz: Map<String, Int>) = wordCloud {
+    width = 1000
+    height = 1000
+    padding = 2
+    background = CircleBackground(500)
+    fontScalar = SqrtFontScalar(10, 40)
+    colorPalette {
+        color(0x4055F1)
+        color(0x408DF1)
+        color(0x40AAF1)
+        color(0x40C5F1)
+        color(0x40D3F1)
+        color(0xFFFFFF)
+    }
+    words = wordz
+}
+
+fun wordCloud(action: WordCloudBuilder.() -> Unit): WordCloud =
+    WordCloudBuilder().apply(action).build()
+
+@DslMarker
+annotation class WordCloudDSL

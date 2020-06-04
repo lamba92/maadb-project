@@ -61,6 +61,26 @@ services:
     ports:
       - 8080:80
 
+  nosql-analitycs-server:
+    image: lamba92/maadb-project-sql-analytics-server
+    networks:
+      - postgres-net
+    depends_on:
+      - postgres
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 15s
+      mode: global
+    environment:
+      - DATABASE_URL="jdbc:postgres//postgres:5432/"
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+    ports:
+      - 8080:80
+
   mongo-supervisor:
     image: lamba92/maadb-project-mongo-supervisor
     networks:
