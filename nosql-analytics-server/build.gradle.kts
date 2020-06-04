@@ -11,6 +11,10 @@ val copySourcesWorkaround by tasks.creating(Copy::class) {
 
 kotlin.target.compilations["main"].compileKotlinTask.dependsOn(copySourcesWorkaround)
 
+application {
+  mainClassName = "edu.unito.maadb.analytics.nosql.MainKt"
+}
+
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
   implementation(project(":nosql"))

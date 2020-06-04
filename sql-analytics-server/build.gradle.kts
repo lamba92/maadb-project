@@ -10,6 +10,10 @@ val copySourcesWorkaround by tasks.creating(Copy::class) {
 
 kotlin.target.compilations["main"].compileKotlinTask.dependsOn(copySourcesWorkaround)
 
+application {
+  mainClassName = "edu.unito.maadb.analytics.sql.MainKt"
+}
+
 dependencies {
 
   val postgresDriversVersion: String by project

@@ -59,7 +59,7 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
     ports:
-      - 8080:80
+        - 8080:80
 
   nosql-analitycs-server:
     image: lamba92/maadb-project-nosql-analytics-server
@@ -78,7 +78,7 @@ services:
       - MONGO_URL="mongodb://mongo-supervisor:27017"
       - MONGO_DB_NAME=maadb
     ports:
-      - 8080:80
+      - 8082:80
 
   mongo-supervisor:
     image: lamba92/maadb-project-mongo-supervisor
