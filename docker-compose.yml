@@ -293,33 +293,33 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongo-supervisor
 
-  sql-data-feeder:
-    image: lamba92/maadb-project-sql-data-feeder
-    networks:
-      - postgres-net
-    depends_on:
-      - postgres
-    deploy:
-      restart_policy:
-        condition: none
-      mode: replicated
-      replicas: 1
-    environment:
-      - DB_URL=jdbc:postgres//postgres:5432/
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-
-  nosql-data-feeder:
-    image: lamba92/maadb-project-sql-data-feeder
-    networks:
-      - mongo-net
-    depends_on:
-      - mongo-supervisor
-    deploy:
-      restart_policy:
-        condition: none
-      mode: replicated
-      replicas: 1
-    environment:
-      - MONGO_URL=mongodb://mongo-supervisor:27017
-      - MONGO_DB_NAME=maadb
+#  sql-data-feeder:
+#    image: lamba92/maadb-project-sql-data-feeder
+#    networks:
+#      - postgres-net
+#    depends_on:
+#      - postgres
+#    deploy:
+#      restart_policy:
+#        condition: none
+#      mode: replicated
+#      replicas: 1
+#    environment:
+#      - DB_URL=jdbc:postgres//postgres:5432/
+#      - DB_USER=postgres
+#      - DB_PASSWORD=postgres
+#
+#  nosql-data-feeder:
+#    image: lamba92/maadb-project-sql-data-feeder
+#    networks:
+#      - mongo-net
+#    depends_on:
+#      - mongo-supervisor
+#    deploy:
+#      restart_policy:
+#        condition: none
+#      mode: replicated
+#      replicas: 1
+#    environment:
+#      - MONGO_URL=mongodb://mongo-supervisor:27017
+#      - MONGO_DB_NAME=maadb

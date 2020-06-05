@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 
 @OptIn(ExperimentalTime::class)
@@ -19,11 +18,6 @@ suspend fun main() {
     initializeReplicaSet(shards, shardsReplicaName)
 
     val process = initializeShardSet(configsReplicaName, configs, shardsReplicaName, shards)
-
-    waitUntilMongoIsUp(port = 27017, delay = 1.seconds)
-
-    mongoEval(command = "sh.enableSharding(\"maadb\")")
-    mongoEval(command = "sh.shardCollection(\"maadb.tweets\", { message : \"hashed\" } )")
 
     exitProcess(withContext(Dispatchers.IO) {
         process.waitFor()
