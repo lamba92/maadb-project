@@ -17,6 +17,11 @@ suspend fun main() {
 
     val process = initializeShardSet(configsReplicaName, configs, shardsReplicaName, shards)
 
+    waitUntilMongoIsUp(port = 27017)
+
+    mongoEval(command = "sh.enableSharding(\"maadb\")")
+    mongoEval(command = "sh.shardCollection(\"maadb.tweets\", { message : \"hashed\" } )")
+
     exitProcess(withContext(Dispatchers.IO) {
         process.waitFor()
     })
