@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -27,10 +28,10 @@ suspend fun checkIfMongoIsUp(host: String = "localhost", port: Int = 27019) =
         mongoEval(host, port, "db.stats()") == 0
 
 @OptIn(ExperimentalTime::class)
-suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019) {
+suspend fun waitUntilMongoIsUp(host: String = "localhost", port: Int = 27019, delay: Duration = 10.seconds) {
     while (!checkIfMongoIsUp(host, port)) {
         println("mongodb://$host:$port not yet up, waiting 10 seconds...")
-        delay(10.seconds)
+        delay(delay)
     }
     println("Host $host:$port is up")
 }
