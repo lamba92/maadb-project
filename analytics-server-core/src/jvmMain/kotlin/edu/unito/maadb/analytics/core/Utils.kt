@@ -38,7 +38,7 @@ class SentimentLocation(sentiment: String) {
 }
 
 @KtorExperimentalLocationsAPI
-@Location("bySpecificSentiment/{sentiment}")
+@Location("{sentiment}")
 class SentimentPagedLocation(sentiment: String, val page: Int = 0, val pageSize: Int = 100) {
     val sentiment by lazy {
         SpecificSentiment.valueOf(sentiment.toUpperCase())

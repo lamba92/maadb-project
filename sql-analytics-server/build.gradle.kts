@@ -23,5 +23,4 @@ dependencies {
   implementation(project(":analytics-server-core"))
   implementation(project(":sql"))
 
-  implementation("org.postgresql", "postgresql", postgresDriversVersion)
 }

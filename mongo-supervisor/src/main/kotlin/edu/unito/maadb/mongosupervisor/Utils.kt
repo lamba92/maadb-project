@@ -83,31 +83,35 @@ suspend fun initializeReplicaSet(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 suspend fun initializeShardSet(
-        configsReplicaName: String,
-        configs: List<Remote>,
-        replicaSetName: String,
-        shards: List<Remote>
+    configsReplicaName: String,
+    configs: List<Remote>,
+    replicaSetName: String,
+    shards: List<Remote>
 ): Process {
     val mongosProcess = withContext(Dispatchers.IO) {
         ProcessBuilder(
-                "mongos",
-                "--configdb",
-                "$configsReplicaName/${configs.joinToString(",")}",
-                "--bind_ip_all"
+            "mongos",
+            "--configdb",
+            "$configsReplicaName/${configs.joinToString(",")}",
+            "--bind_ip_all"
         )
-                .inheritIO()
-                .start()
+            .inheritIO()
+            .start()
     }
 
     waitUntilMongoIsUp(port = 27017)
 
-    mongoEval("localhost", 27017) {
-        append("sh.addShard(\"")
-        append(replicaSetName)
-        append("/")
-        append(shards.joinToString(",") { "${it.host}:${it.port}" })
-        append("\")")
+    while (mongoEval("localhost", 27017) {
+            append("sh.addShard(\"")
+            append(replicaSetName)
+            append("/")
+            append(shards.joinToString(",") { "${it.host}:${it.port}" })
+            append("\")")
+        } == 0) {
+        println("Failed to initialize sharded cluster. Retrying...")
+        delay(5.seconds)
     }
 
     return mongosProcess

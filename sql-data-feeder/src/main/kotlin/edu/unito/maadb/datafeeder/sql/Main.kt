@@ -7,6 +7,11 @@ suspend fun main() {
     val DB_URL: String by System.getenv()
     val DB_USER: String by System.getenv()
     val DB_PASSWORD: String by System.getenv()
-    val db = Database.connect(DB_URL, user = DB_USER, password = DB_PASSWORD)
+    val db = Database.connect(
+        DB_URL,
+        user = DB_USER,
+        password = DB_PASSWORD,
+        driver = org.postgresql.Driver::class.qualifiedName!!
+    )
     populateDatabase(db)
 }

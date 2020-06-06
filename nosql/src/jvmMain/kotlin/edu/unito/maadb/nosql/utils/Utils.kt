@@ -108,7 +108,7 @@ suspend fun populateResources(database: CoroutineDatabase) {
 }
 
 suspend fun populateDatabase(database: CoroutineDatabase): List<ElaboratedTweet> {
-  populateResources(database)
+//  populateResources(database)
   return populateTweets(database)
 }
 

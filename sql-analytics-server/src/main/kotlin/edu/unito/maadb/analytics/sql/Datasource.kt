@@ -33,7 +33,7 @@ object Datasource : DatasourceElaborator {
     Database.connect(
         url = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://192.168.1.159:5432/",
         user = System.getenv("DATABASE_USER") ?: "postgres",
-        password = System.getenv("DATABASE_PASSWORD") ?: "mysecretpassword",
+        password = System.getenv("DATABASE_PASSWORD") ?: "postgres",
         driver = org.postgresql.Driver::class.qualifiedName!!
     )
   }

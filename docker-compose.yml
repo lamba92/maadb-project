@@ -28,6 +28,8 @@ services:
 
   postgres:
     image: postgres
+    networks:
+      - postgres-net
     deploy:
       restart_policy:
         delay: 0s
@@ -41,7 +43,7 @@ services:
     ports:
       - 5432:5432
 
-  sql-analitycs-server:
+  sql-analytics-server:
     image: lamba92/maadb-project-sql-analytics-server
     networks:
       - postgres-net
@@ -55,13 +57,13 @@ services:
         window: 15s
       mode: global
     environment:
-      - DATABASE_URL=jdbc:postgres//postgres:5432/
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
     ports:
         - 8080:80
 
-  nosql-analitycs-server:
+  nosql-analytics-server:
     image: lamba92/maadb-project-nosql-analytics-server
     networks:
       - mongo-net
@@ -91,12 +93,6 @@ services:
       - ms2
       - ms3
       - ms4
-      - ms5
-      - ms6
-      - ms7
-      - ms8
-      - ms9
-      - ms10
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.stats()"]
     deploy:
@@ -107,7 +103,7 @@ services:
         window: 15s
     environment:
       - CONFIGS=mongo-cfg-1:27019,mongo-cfg-2:27019
-      - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018,ms5:27018,ms6:27018,ms7:27018,ms8:27018,ms9:27018,ms10:27018
+      - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018
       - CONFIGS_RPL_NAME=cfgrs
       - SHARDS_RPL_NAME=datars
     ports:
@@ -197,84 +193,6 @@ services:
         max_attempts: 5
         window: 10s
 
-  ms5:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
-  ms6:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
-  ms7:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
-  ms8:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
-  ms9:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
-  ms10:
-    image: mongo
-    command: mongod --shardsvr --bind_ip_all --replSet datars
-    networks:
-      - mongo-net
-    healthcheck:
-      test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
-    deploy:
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
   mongo-express:
     image: mongo-express
     networks:
@@ -293,33 +211,3 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongo-supervisor
 
-#  sql-data-feeder:
-#    image: lamba92/maadb-project-sql-data-feeder
-#    networks:
-#      - postgres-net
-#    depends_on:
-#      - postgres
-#    deploy:
-#      restart_policy:
-#        condition: none
-#      mode: replicated
-#      replicas: 1
-#    environment:
-#      - DB_URL=jdbc:postgres//postgres:5432/
-#      - DB_USER=postgres
-#      - DB_PASSWORD=postgres
-#
-#  nosql-data-feeder:
-#    image: lamba92/maadb-project-sql-data-feeder
-#    networks:
-#      - mongo-net
-#    depends_on:
-#      - mongo-supervisor
-#    deploy:
-#      restart_policy:
-#        condition: none
-#      mode: replicated
-#      replicas: 1
-#    environment:
-#      - MONGO_URL=mongodb://mongo-supervisor:27017
-#      - MONGO_DB_NAME=maadb

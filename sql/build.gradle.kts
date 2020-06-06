@@ -21,7 +21,7 @@ kotlin.sourceSets {
             api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
             api("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
             api("ch.qos.logback:logback-classic:$logbackVersion")
-            implementation("org.postgresql:postgresql:$postgresDriversVersion")
+            api("org.postgresql:postgresql:$postgresDriversVersion")
 
         }
     }

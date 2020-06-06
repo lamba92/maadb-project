@@ -26,74 +26,74 @@ abstract class AbstractMongoDBDatasource : DatasourceElaborator {
   @Serializable
   data class StatsReduceResult(
       @SerialName("_id") val word: String,
-      @SerialName("value") val occurrences: Int
+      @SerialName("value") val occurrences: Double
   )
 
   protected abstract val tweetsCollection: CoroutineCollection<ElaboratedTweet>
 
   override suspend fun statsTweets(sentiment: SpecificSentiment): TweetsStatisticsResult {
-    val (data, duration) = measureTimedValue {
-      val wordsCounted = tweetsCollection.mapReduce<StatsReduceResult>(
-          getResource("statsTweetMap.js")
-              .readText()
-              .replace("%%%SENTIMENT%%%", sentiment.toString()),
-          getResource("statsReduce.js").readText()
-      )
-          .toList()
-          .associate { it.word to it.occurrences }
+      val (data, duration) = measureTimedValue {
+          val wordsCounted = tweetsCollection.mapReduce<StatsReduceResult>(
+              getResource("statsTweetMap.js")
+                  .readText()
+                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
+              getResource("statsReduce.js").readText()
+          )
+              .toList()
+              .associate { it.word to it.occurrences.toInt() }
 
-      val resources = Resources.LexicalData.Sentiments.Specific.getValue(sentiment)
-          .EVERY_RESOURCE
-          .filter { "_" !in it }
+          val resources = Resources.LexicalData.Sentiments.Specific.getValue(sentiment)
+              .EVERY_RESOURCE
+              .filter { "_" !in it }
 
-      val newWords = wordsCounted.keys.filter { it !in resources }
+          val newWords = wordsCounted.keys.filter { it !in resources }
 
-      wordsCounted to newWords
-    }
+          wordsCounted to newWords
+      }
 
     return TweetsStatisticsResult(sentiment, data.first, data.second, duration.toLongMilliseconds())
 
   }
 
   override suspend fun statsHashtags(sentiment: SpecificSentiment): StatisticsResult {
-    val (hashtagsCounted, duration) = measureTimedValue {
-      tweetsCollection.mapReduce<StatsReduceResult>(
-          getResource("statsHashtagsMap.js")
-              .readText()
-              .replace("%%%SENTIMENT%%%", sentiment.toString()),
-          getResource("statsReduce.js").readText()
-      )
-          .toList()
-          .associate { it.word to it.occurrences }
-    }
+      val (hashtagsCounted, duration) = measureTimedValue {
+          tweetsCollection.mapReduce<StatsReduceResult>(
+              getResource("statsHashtagsMap.js")
+                  .readText()
+                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
+              getResource("statsReduce.js").readText()
+          )
+              .toList()
+              .associate { it.word to it.occurrences.toInt() }
+      }
     return StatisticsResult(sentiment, hashtagsCounted, duration.toLongMilliseconds())
   }
 
   override suspend fun statsEmoticons(sentiment: SpecificSentiment): StatisticsResult {
-    val (emoticonsCounted, duration) = measureTimedValue {
-      tweetsCollection.mapReduce<StatsReduceResult>(
-          getResource("statsEmoticonsMap.js")
-              .readText()
-              .replace("%%%SENTIMENT%%%", sentiment.toString()),
-          getResource("statsReduce.js").readText()
-      )
-          .toList()
-          .associate { it.word to it.occurrences }
-    }
+      val (emoticonsCounted, duration) = measureTimedValue {
+          tweetsCollection.mapReduce<StatsReduceResult>(
+              getResource("statsEmoticonsMap.js")
+                  .readText()
+                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
+              getResource("statsReduce.js").readText()
+          )
+              .toList()
+              .associate { it.word to it.occurrences.toInt() }
+      }
     return StatisticsResult(sentiment, emoticonsCounted, duration.toLongMilliseconds())
   }
 
   override suspend fun statsEmojis(sentiment: SpecificSentiment): StatisticsResult {
-    val (emojisCounted, duration) = measureTimedValue {
-      tweetsCollection.mapReduce<StatsReduceResult>(
-          getResource("statsEmojisMap.js")
-              .readText()
-              .replace("%%%SENTIMENT%%%", sentiment.toString()),
-          getResource("statsReduce.js").readText()
-      )
-          .toList()
-          .associate { it.word to it.occurrences }
-    }
+      val (emojisCounted, duration) = measureTimedValue {
+          tweetsCollection.mapReduce<StatsReduceResult>(
+              getResource("statsEmojisMap.js")
+                  .readText()
+                  .replace("%%%SENTIMENT%%%", sentiment.toString()),
+              getResource("statsReduce.js").readText()
+          )
+              .toList()
+              .associate { it.word to it.occurrences.toInt() }
+      }
     return StatisticsResult(sentiment, emojisCounted, duration.toLongMilliseconds())
   }
 

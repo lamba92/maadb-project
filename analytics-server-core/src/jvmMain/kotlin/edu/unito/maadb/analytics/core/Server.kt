@@ -3,9 +3,12 @@ package edu.unito.maadb.analytics.core
 import edu.unito.maadb.core.ElaboratedTweet
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.features.CachingHeaders
 import io.ktor.features.ContentNegotiation
+import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.CachingOptions
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
@@ -22,9 +25,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import kotlin.time.ExperimentalTime
+import kotlin.time.minutes
 
-
-@OptIn(KtorExperimentalLocationsAPI::class)
+@OptIn(KtorExperimentalLocationsAPI::class, ExperimentalTime::class)
 fun getServer(datasource: DatasourceElaborator) = embeddedServer(Tomcat) {
 
     install(ContentNegotiation) {
@@ -32,6 +36,15 @@ fun getServer(datasource: DatasourceElaborator) = embeddedServer(Tomcat) {
     }
 
     install(Locations)
+
+    install(CachingHeaders) {
+        options { outgoingContent ->
+            when (outgoingContent.contentType?.withoutParameters()) {
+                ContentType.Image.PNG -> CachingOptions(CacheControl.MaxAge(10.minutes.inSeconds.toInt()))
+                else -> null
+            }
+        }
+    }
 
     routing {
         route("wordClouds") {
