@@ -60,7 +60,7 @@ class MaadbApplicationPlugin : Plugin<Project> {
                     into(dockerBuildFolder)
                 }
 
-                fun commands(withVersion: Boolean = false, addArm32: Boolean = "mongo" !in project.name) = arrayOf(
+                fun commands(withVersion: Boolean = false, addArm32: Boolean = "supervisor" !in project.name) = arrayOf(
                     "docker", "buildx", "build", "-t",
                     buildString {
                         append("lamba92/${rootProject.name}-${project.name}")
