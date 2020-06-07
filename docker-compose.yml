@@ -35,6 +35,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - 5432:5432
     deploy:
       restart_policy:
         delay: 0s
@@ -105,6 +107,9 @@ services:
       - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018
       - CONFIGS_RPL_NAME=cfgrs
       - SHARDS_RPL_NAME=datars
+    ports:
+      - 27017:27017
+
 
   mongo-cfg-1:
     image: mongo
@@ -213,8 +218,6 @@ services:
       - mongo-net
       - postgres-net
     volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - 80:80
-      - 5432:5432
-      - 27017:27017

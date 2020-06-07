@@ -28,7 +28,7 @@ fun <K> Iterable<Pair<K, Int>>.merge(accumulator: MutableMap<K, Int> = mutableMa
 }
 
 @KtorExperimentalLocationsAPI
-@Location("bySpecificSentiment/{sentiment}")
+@Location("{sentiment}")
 class SentimentLocation(sentiment: String) {
     val sentiment by lazy {
         SpecificSentiment.valueOf(sentiment.toUpperCase())
