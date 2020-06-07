@@ -18,7 +18,7 @@ include(
     ":core",
     ":sql",
     ":nosql",
-    ":maadb-supervisor",
+    ":supervisor",
     ":analytics-server-core",
     ":sql-analytics-server",
     ":nosql-analytics-server",

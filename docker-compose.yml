@@ -71,7 +71,7 @@ services:
     networks:
       - mongo-net
     depends_on:
-      - mongo-supervisor
+      - supervisor
     deploy:
       restart_policy:
         condition: on-failure
@@ -80,11 +80,11 @@ services:
         window: 15s
       mode: global
     environment:
-      - MONGO_URL=mongodb://mongo-supervisor:27017
+      - MONGO_URL=mongodb://supervisor:27017
       - MONGO_DB_NAME=maadb
 
-  maadb-supervisor:
-    image: lamba92/maadb-project-maadb-supervisor
+  supervisor:
+    image: lamba92/maadb-project-supervisor
     networks:
       - mongo-net
       - postgres-net
@@ -200,21 +200,19 @@ services:
         max_attempts: 5
         window: 10s
 
-  mongo-express:
-    image: mongo-express
-    networks:
-      - mongo-net
-    depends_on:
-      - mongo-supervisor
-    deploy:
-      restart_policy:
-        delay: 20s
-        max_attempts: 5
-        window: 20s
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
-      - ME_CONFIG_MONGODB_SERVER=mongo-supervisor
+  #  mongo-ui:
+  #    image: huggingface/mongoku
+  #    networks:
+  #      - mongo-net
+  #    depends_on:
+  #      - supervisor
+  #    deploy:
+  #      restart_policy:
+  #        delay: 20s
+  #        max_attempts: 5
+  #        window: 20s
+  #    environment:
+  #      - MONGOKU_DEFAULT_HOST=mongodb://supervisor:27017
 
   api-gateway:
     image: nginx
