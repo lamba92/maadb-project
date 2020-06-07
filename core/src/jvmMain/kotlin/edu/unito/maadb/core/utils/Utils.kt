@@ -7,7 +7,10 @@ import emoji4j.EmojiManager
 import emoji4j.EmojiUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
 import opennlp.tools.postag.POSTagger
 
 fun extractEmoticons(message: String) =
@@ -65,17 +68,17 @@ fun elaborateTweet(
 }
 
 @OptIn(ExperimentalStdlibApi::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
-fun getTweetsElaborationChunkedFlow(chunkSize: Int = 100, tools: TweetsElaborationTools) =
+fun getTweetsElaborationChunkedFlow(chunkSize: Int = 100, tools: TweetsElaborationTools = TweetsElaborationTools.Defaults) =
     Resources.Tweets.entries.asFlow()
         .flatMapMergeIterable { (sentiment, tweets) ->
-          tweets.map { sentiment to it }
+            tweets.map { sentiment to it }
         }
         .withLongIndex()
         .map { (index, data) ->
             val (sentiment, tweet) = data
-          elaborateTweet(
-              index,
-              sentiment,
+            elaborateTweet(
+                index,
+                sentiment,
               tweet,
               tools
           )

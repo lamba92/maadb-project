@@ -83,11 +83,13 @@ services:
       - MONGO_URL=mongodb://mongo-supervisor:27017
       - MONGO_DB_NAME=maadb
 
-  mongo-supervisor:
-    image: lamba92/maadb-project-mongo-supervisor
+  maadb-supervisor:
+    image: lamba92/maadb-project-maadb-supervisor
     networks:
       - mongo-net
+      - postgres-net
     depends_on:
+      - postgres
       - mongo-cfg-1
       - mongo-cfg-2
       - ms1
@@ -103,13 +105,16 @@ services:
         max_attempts: 3
         window: 15s
     environment:
-      - CONFIGS=mongo-cfg-1:27019,mongo-cfg-2:27019
-      - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018
-      - CONFIGS_RPL_NAME=cfgrs
-      - SHARDS_RPL_NAME=datars
+      - MONGO_CONFIGS=mongo-cfg-1:27019,mongo-cfg-2:27019
+      - MONGO_SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018
+      - MONGO_CONFIGS_RPL_NAME=cfgrs
+      - MONGO_SHARDS_RPL_NAME=datars
+      - MONGO_DB_NAME=maadb
+      - RELATIONAL_DB_URL=jdbc:postgresql://postgres:5432/
+      - RELATIONAL_DB_USER=postgres
+      - RELATIONAL_DB_PASSWORD=postgres
     ports:
       - 27017:27017
-
 
   mongo-cfg-1:
     image: mongo
@@ -203,9 +208,9 @@ services:
       - mongo-supervisor
     deploy:
       restart_policy:
-        delay: 5s
+        delay: 20s
         max_attempts: 5
-        window: 10s
+        window: 20s
     environment:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password

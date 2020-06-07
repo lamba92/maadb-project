@@ -11,28 +11,32 @@ import edu.unito.maadb.nosql.model.ListResourceWithSentiment
 import edu.unito.maadb.nosql.model.MapResource
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
+import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
 suspend fun populateTweets(
     database: CoroutineDatabase,
     tools: TweetsElaborationTools = TweetsElaborationTools.Defaults
 ) = with(database.createCollection<ElaboratedTweet>("tweets")) {
-  getTweetsElaborationChunkedFlow(100, tools).onEach {
+    getTweetsElaborationChunkedFlow(100, tools).onEach {
         insertMany(it)
-      }
-      .toList()
-      .flatten()
-      .sortedBy { it._id }
+    }
+        .toList()
+        .flatten()
+        .sortedBy { it._id }
 }
+
+suspend fun CoroutineCollection<ElaboratedTweet>.insertTweets(tweets: List<ElaboratedTweet>) =
+    insertMany(tweets)
 
 suspend fun populateResources(database: CoroutineDatabase) {
 
-  val listResourcesCollection =
-      database.createCollection<ListResource>("listResources") {
-        storageEngineOptions {
-          autoIndexId = true
+    val listResourcesCollection =
+        database.createCollection<ListResource>("listResources") {
+            storageEngineOptions {
+                autoIndexId = true
+            }
         }
-      }
 
   val listResourceWithSentimentCollection =
       database.createCollection<ListResourceWithSentiment>("listResourceWithSentiment") {
