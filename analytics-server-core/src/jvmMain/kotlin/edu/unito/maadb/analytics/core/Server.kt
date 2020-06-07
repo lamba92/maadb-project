@@ -4,6 +4,7 @@ import edu.unito.maadb.core.ElaboratedTweet
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CachingHeaders
+import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
@@ -25,6 +26,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.slf4j.event.Level
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
@@ -36,6 +38,9 @@ fun getServer(datasource: DatasourceElaborator) = embeddedServer(Tomcat) {
     }
 
     install(Locations)
+    install(CallLogging) {
+        level = Level.DEBUG
+    }
 
     install(CachingHeaders) {
         options { outgoingContent ->

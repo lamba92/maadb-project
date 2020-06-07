@@ -30,6 +30,11 @@ services:
     image: postgres
     networks:
       - postgres-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       restart_policy:
         delay: 0s
@@ -40,8 +45,6 @@ services:
           - node.role==manager
     environment:
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5432:5432
 
   sql-analytics-server:
     image: lamba92/maadb-project-sql-analytics-server
@@ -60,8 +63,6 @@ services:
       - DATABASE_URL=jdbc:postgresql://postgres:5432/
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
-    ports:
-        - 8080:80
 
   nosql-analytics-server:
     image: lamba92/maadb-project-nosql-analytics-server
@@ -79,8 +80,6 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo-supervisor:27017
       - MONGO_DB_NAME=maadb
-    ports:
-      - 8082:80
 
   mongo-supervisor:
     image: lamba92/maadb-project-mongo-supervisor
@@ -106,8 +105,6 @@ services:
       - SHARDS=ms1:27018,ms2:27018,ms3:27018,ms4:27018
       - CONFIGS_RPL_NAME=cfgrs
       - SHARDS_RPL_NAME=datars
-    ports:
-      - 27017:27017
 
   mongo-cfg-1:
     image: mongo
@@ -204,10 +201,20 @@ services:
         delay: 5s
         max_attempts: 5
         window: 10s
-    ports:
-      - 8081:8081
     environment:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongo-supervisor
 
+  api-gateway:
+    image: nginx
+    command: [nginx-debug, '-g', 'daemon off;']
+    networks:
+      - mongo-net
+      - postgres-net
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+      - 5432:5432
+      - 27017:27017
