@@ -7,7 +7,7 @@ ARG TAR_NAME
 RUN mkdir -p /usr/share/man/man1
 
 RUN apt update > /dev/null
-RUN apt install -yqq openjdk-8-jdk humanity-icon-theme-
+RUN apt install -yqq openjdk-11-jdk humanity-icon-theme-
 RUN apt clean
 
 COPY $TAR_NAME.tar $TAR_NAME.tar
