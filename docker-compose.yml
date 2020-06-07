@@ -217,6 +217,9 @@ services:
   api-gateway:
     image: nginx
     command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - sql-analytics-server
+      - nosql-analytics-server
     networks:
       - mongo-net
       - postgres-net
