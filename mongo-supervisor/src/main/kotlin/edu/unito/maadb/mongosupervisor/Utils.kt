@@ -109,7 +109,7 @@ suspend fun initializeShardSet(
             append("/")
             append(shards.joinToString(",") { "${it.host}:${it.port}" })
             append("\")")
-        } == 0) {
+        } != 0) {
         println("Failed to initialize sharded cluster. Retrying...")
         delay(5.seconds)
     }
