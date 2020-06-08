@@ -6,26 +6,6 @@ networks:
 
 services:
 
-  jupyter-kotlin:
-    image: lamba92/kotlin-jupyter:1.0.1
-    ports:
-      - 8888:8888
-    volumes:
-      - type: bind
-        source: ~/notebooks
-        target: /notebooks
-    networks:
-      - mongo-net
-      - postgres-net
-    deploy:
-      placement:
-        constraints:
-          - node.role==manager
-      restart_policy:
-        delay: 5s
-        max_attempts: 5
-        window: 10s
-
   postgres:
     image: postgres
     networks:
@@ -44,7 +24,7 @@ services:
         window: 5s
       placement:
         constraints:
-          - node.role==manager
+          - node.labels.type==rpi2
     environment:
       - POSTGRES_PASSWORD=postgres
 
@@ -60,7 +40,9 @@ services:
         delay: 5s
         max_attempts: 3
         window: 15s
-      mode: global
+      placement:
+        constraints:
+          - node.labels.type==rpi4
     environment:
       - DATABASE_URL=jdbc:postgresql://postgres:5432/
       - DATABASE_USER=postgres
@@ -78,7 +60,9 @@ services:
         delay: 5s
         max_attempts: 3
         window: 15s
-      mode: global
+      placement:
+        constraints:
+          - node.labels.type==rpi4
     environment:
       - MONGO_URL=mongodb://supervisor:27017
       - MONGO_DB_NAME=maadb
@@ -200,23 +184,13 @@ services:
         max_attempts: 5
         window: 10s
 
-  #  mongo-ui:
-  #    image: huggingface/mongoku
-  #    networks:
-  #      - mongo-net
-  #    depends_on:
-  #      - supervisor
-  #    deploy:
-  #      restart_policy:
-  #        delay: 20s
-  #        max_attempts: 5
-  #        window: 20s
-  #    environment:
-  #      - MONGOKU_DEFAULT_HOST=mongodb://supervisor:27017
-
   api-gateway:
     image: nginx
     command: [nginx-debug, '-g', 'daemon off;']
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type==rpi2
     depends_on:
       - sql-analytics-server
       - nosql-analytics-server
