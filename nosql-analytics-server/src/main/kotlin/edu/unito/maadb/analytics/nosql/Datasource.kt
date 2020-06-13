@@ -14,7 +14,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
 import kotlin.math.ceil
 import kotlin.time.ExperimentalTime
@@ -103,11 +102,11 @@ abstract class AbstractMongoDBDatasource : DatasourceElaborator {
       pageSize: Int
   ): PagedData<List<ElaboratedTweet>> = coroutineScope {
     val totalPages = async {
-      ceil(tweetsCollection.countDocuments(ElaboratedTweet::sentiment eq sentiment) / pageSize.toFloat())
+      ceil(tweetsCollection.countDocuments("{sentiment: \"$sentiment\"}") / pageSize.toFloat())
           .toInt()
     }
     val data = async {
-      tweetsCollection.find(ElaboratedTweet::sentiment eq sentiment)
+        tweetsCollection.find("{sentiment: \"$sentiment\"}")
           .skip(page * pageSize)
           .limit(pageSize)
           .toList()

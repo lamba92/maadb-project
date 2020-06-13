@@ -186,7 +186,7 @@ services:
 
   api-gateway:
     image: nginx
-    command: [nginx-debug, '-g', 'daemon off;']
+    command: ["nginx-debug", "-g", "daemon off;"]
     deploy:
       placement:
         constraints:
@@ -199,5 +199,6 @@ services:
       - postgres-net
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.log:/nginx.log:rw
     ports:
       - 80:80
