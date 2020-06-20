@@ -54,7 +54,9 @@ object Datasource : DatasourceElaborator {
       wordsCounted to newWords
     }
 
-    return TweetsStatisticsResult(sentiment, data.first, data.second, duration.toLongMilliseconds())
+    val (wordsCounted, newWords) = data
+
+    return TweetsStatisticsResult(sentiment, wordsCounted, newWords, duration.toLongMilliseconds())
   }
 
   override suspend fun statsHashtags(sentiment: SpecificSentiment): StatisticsResult {
