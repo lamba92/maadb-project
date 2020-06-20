@@ -79,9 +79,9 @@ networks:
   mongo-net:
   postgres-net:
 ```
-The [`supervisor`](maadb-stack.yml#L70-L101) container is in charge of setting up the MongoDB cluster and populate both the MongoDB cluster and PostgreSQL. 
+The [`supervisor`](maadb-stack.yml#L74-L105) container is in charge of setting up the MongoDB cluster and populate both the MongoDB cluster and PostgreSQL. 
 
-The [`api-gateway`](maadb-stack.yml#L107-L204) exposes both for SQL and NoSQL services as RESTfull APIs. The [`nginx.conf`](nginx.conf) is available in the repository.
+The [`api-gateway`](maadb-stack.yml#L203-L220) exposes both for SQL and NoSQL services as RESTfull APIs. The [`nginx.conf`](nginx.conf) is available in the repository.
 
 NB: due to a bug in Ktor (Ktor issue [here](https://github.com/ktorio/ktor/issues/1933) and NGINX issue [here](https://trac.nginx.org/nginx/ticket/2000)) it is not possible to query the word clouds through the API gateway. As workaround the SQL services are exposed at port `8083` and NoSQL services at `8084`.
 
