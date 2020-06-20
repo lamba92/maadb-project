@@ -8,6 +8,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
+/**
+ * Load resources on SQL database
+ */
 suspend fun populateResources(database: Database) {
 
     suspend fun <T> t(s: suspend Transaction.() -> T) =

@@ -77,11 +77,11 @@ fun getTweetsElaborationChunkedFlow(chunkSize: Int = 100, tools: TweetsElaborati
         .map { (index, data) ->
             val (sentiment, tweet) = data
             elaborateTweet(
-                index,
-                sentiment,
-              tweet,
-              tools
-          )
+                    index,
+                    sentiment,
+                    tweet,
+                    tools
+            )
         }
         .chunked(chunkSize)
 
