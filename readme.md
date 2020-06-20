@@ -22,7 +22,8 @@ Tools used to develop:
 * [Exposed] - Relational ORM for Kotlin
 * [KMongo] - Kotlin API for MongoDB
 
-##Our Solution
+## Our Solution
+
 The solution works on two different type of database:
 
 - SQL (PostgreSQL)
@@ -48,7 +49,7 @@ The Mongo DB cluster consists in 4 `mongod` instances that shards the data and 2
 the database configuration settings. the cluster is coordinated by a `mongos` router instance that exposes the cluster 
 to clients.
 
-###Elaboration
+### Elaboration
 The first step was to get tweets and elaborate them:
 
 ![tweets_pipeline](assets/tweet-elaboration-pipeline.png)
