@@ -47,6 +47,8 @@ services:
       - DATABASE_URL=jdbc:postgresql://postgres:5432/
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
+    ports:
+      - 8083:80
 
   nosql-analytics-server:
     image: lamba92/maadb-project-nosql-analytics-server
@@ -66,6 +68,8 @@ services:
     environment:
       - MONGO_URL=mongodb://supervisor:27017
       - MONGO_DB_NAME=maadb
+    ports:
+      - 8084:80
 
   supervisor:
     image: lamba92/maadb-project-supervisor
@@ -140,6 +144,9 @@ services:
     healthcheck:
       test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
+      placement:
+        constraints:
+          - node.labels.mongo.role==data1
       restart_policy:
         delay: 5s
         max_attempts: 5
@@ -153,6 +160,9 @@ services:
     healthcheck:
       test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
+      placement:
+        constraints:
+          - node.labels.mongo.role==data2
       restart_policy:
         delay: 5s
         max_attempts: 5
@@ -166,6 +176,9 @@ services:
     healthcheck:
       test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
+      placement:
+        constraints:
+          - node.labels.mongo.role==data1
       restart_policy:
         delay: 5s
         max_attempts: 5
@@ -179,6 +192,9 @@ services:
     healthcheck:
       test: ["CMD", "mongo", "--port", "27018", "--eval", "db.stats()"]
     deploy:
+      placement:
+        constraints:
+          - node.labels.mongo.role==data2
       restart_policy:
         delay: 5s
         max_attempts: 5

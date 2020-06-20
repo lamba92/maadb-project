@@ -1,6 +1,6 @@
-GET http://localhost:80/data/tweets/anger?pageSize=10&page=1
+GET http://192.168.1.158/sql/statistics/tweets/anger
 Accept: application/json
 
 ###
-GET http://192.168.1.158/sql/wordClouds/tweets/anger
+GET http://localhost/wordClouds/tweets/anger
 Accept: application/json

@@ -1,8 +1,4 @@
-# MAADB Project
-
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
-
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+# MAADB Project [![Build Status](https://travis-ci.org/lamba92/maadb-project.svg?branch=master)](https://travis-ci.org/lamba92/maadb-project)
 
 ##Overview
 This project consists on different type of resources:
@@ -12,18 +8,18 @@ This project consists on different type of resources:
     - list of words or symbols that are related to the sentence
 
 For each word found in the Twitter messages we have three purposes: 
-1. list the lexical resources containing each word, so that we can rely upon a unique resource source 
-obtained by the fusion of the single resources.
+1. check if the word is listed in all related resource.
 2. count the number of occurrences of each word in the Twitter messages for each emotion.
 3. draw a word cloud associated to the most frequent words in each emotion.
 
 ### Tech
 Tools used to develop:
 
-* [Docker] - 
+* [Docker] - Enterprise-grade containerization solution.
+* [Docker Swarm] - Simple and fast Orchestrator for Docker.
 * [Kotlin] - Programming Language
 * [Ktor] - Framework for building asynchronous servers and clients in connected systems
-* [Exposed] - Framework to access database with Kotlin
+* [Exposed] - Relational ORM for Kotlin
 * [KMongo] - Kotlin API for MongoDB
 
 ##Our Solution
@@ -32,20 +28,37 @@ The solution works on two different type of database:
 - SQL (PostgreSQL)
 - NoSQL (MongoDB)
 
-In particular, we take advantage of Docker to run our databases on a cluster: three raspberry pi.
+In particular, we take advantage of Docker to run our databases on a cluster:
+ - 2x Raspberry Pi v4 (Ubuntu 20.04, ARM64, 4GB RAM).
+ - 1x Raspberry Pi v2b (Ubuntu 20.04, ARM32, 1GB RAM).
 Moreover, we created a MongoDB with shard and replication and implemented map reduction to retrieve data and statistics.
+
+### Project Architecture
+
+![proj image](assets/architettura-librerie-maadb.png)
+
+The project has 8 modules and a build project. The libraries are all published on Bintray while the applications are 
+published as Docker images on the Docker Hub.
+
+### MongoDB cluster
+
+![proj image](assets/mongo-cluster.png)
+
+The Mongo DB cluster consists in 4 `mongod` instances that shards the data and 2 `mongod` instances that replicates 
+the database configuration settings. the cluster is coordinated by a `mongos` router instance that exposes the cluster 
+to clients.
 
 ###Elaboration
 The first step was to get tweets and elaborate them:
 
-[IMAGE]
+![tweets_pipeline](assets/tweet-elaboration-pipeline.png)
 
 - remove URL and USERNAME
 - remove the hashtags
 - remove and create a relative list of emoji and emoticons
 - find and replace punctuation with no space
 - transform to lower case
-- tokenisation
+- tokenizing
 - using the slang words and acronyms file to replace them
 - POS Tagging
 - stemming
@@ -55,48 +68,64 @@ The first step was to get tweets and elaborate them:
 
 ### Docker
 
-Docker runs on two different networks (one for SQL, another for NoSQL)
-```sh
+![docker_stack](assets/raspi-stack.png)
+
+[`maadb-stack.yml`](maadb-stack.yml) declared all the services shown in the image above. 
+
+The stack runs on two different networks (one for SQL, another for NoSQL)
+```yml
 networks:
   mongo-net:
   postgres-net:
 ```
-This will create the dillinger image and pull in the necessary dependencies. Be sure to swap out `${package.json.version}` with the actual version of Dillinger.
+The [`supervisor`](maadb-stack.yml#L70-101) container is in charge of setting up the MongoDB cluster and populate both the MongoDB cluster and PostgreSQL. 
 
-Once done, run the Docker image and map the port to whatever you wish on your host. In this example, we simply map port 8000 of the host to port 8080 of the Docker (or whatever port was exposed in the Dockerfile):
+The [`api-gateway`](maadb-stack.yml#L107-204) exposes both for SQL and NoSQL services as RESTfull APIs. The [`nginx.conf`](nginx.conf) is available in the repository.
 
-```sh
-docker run -d -p 8000:8080 --restart="always" <youruser>/dillinger:${package.json.version}
-```
+NB: due to a bug in Ktor (Ktor issue [here](https://github.com/ktorio/ktor/issues/1933) and NGINX issue [here](https://trac.nginx.org/nginx/ticket/2000)) it is not possible to query the word clouds through the API gateway. As workaround the SQL services are exposed at port `8083` and NoSQL services at `8084`.
 
 ### Get some data
 
-In order to get data or statistics simply do a http request.
-The request can be modulated choosing the following route
-- sql or nosql : select from which database retrieve data
-- data, statistics or worldcloud
-- tweet, hashtags, emoticons or emojis : about data type
-- sentiment on which restrict the research
+All endpoints should be prefixed with either `/sql/` or `/nosql/`. Each will address the correct services and data sources with the exact same functionalities:
 
-E.g.
-This query get the anger tweets from nosql database:
+```
+/{sql|nosql}/{statistics|wordClouds}/{tweets|hashtags|emoticons|emojis}/{sentiment}`
 
-```sh
-GET http://localhost8080/nosql/data/tweets/anger
+/{sql|nosql}/data/tweets/{sentiment}?pageSize={integer}&page={integer}
 ```
 
-It is also possible to get some statistics, simply replace the data keyword with statistics:
+All combinations will retrieve different information based on the url shape. The types of the responses can be typed using the classes available in [`analitycs-core`](analytics-core/src/jvmMain/kotlin/edu/unito/maadb/sql/analytics/core/TweetsStatisticsResult.kt).
 
-```sh
-GET http://localhost8080/nosql/statistics/tweets/anger
+Some examples: 
+`http://192.168.1.158/sql/statistics/tweets/anger`:
+```json
+{
+  "sentiment": "ANGER",
+  "wordsWithOccurrences": {
+    "fuck": 20,
+    "spell": 3,
+    "fire": 3,
+    "noo": 4,
+    ...
+    "cream": 1
+  },
+  "newWordsNotInResources": [
+    "fuck",
+    "spell",
+    "fire",
+    "noo",
+    ...
+    "cream"
+  ],
+  "timeInMilliseconds": 315
+}
 ```
-
-License
-----
-**Free Software, Hell Yeah!**
+`http://192.168.1.158/sql/wordClouds/hashtags/joy`:
+![joy_wordcloud_hashtags](assets/joy.png)
 
 [Docker]: <https://www.docker.com>
-[Kotlin]: <https://kotlinlang.org>
-[Ktor]: <https://ktor.io)>
+[Docker Swarm]: <https://docs.docker.com/engine/swarm/>
+[Kotlin]: <https://kotlinlang.org> 
+[Ktor]: <https://ktor.io>
 [Exposed]: <https://github.com/JetBrains/Exposed>
 [KMongo]: <https://litote.org/kmongo>
