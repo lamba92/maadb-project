@@ -19,8 +19,9 @@ import io.ktor.response.respondText
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.tomcat.Tomcat
+import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.list
@@ -30,8 +31,8 @@ import org.slf4j.event.Level
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
-@OptIn(KtorExperimentalLocationsAPI::class, ExperimentalTime::class)
-fun getServer(datasource: DatasourceElaborator) = embeddedServer(Tomcat) {
+@OptIn(KtorExperimentalLocationsAPI::class, ExperimentalTime::class, KtorExperimentalAPI::class)
+fun getServer(datasource: DatasourceElaborator) = embeddedServer(CIO) {
 
     install(ContentNegotiation) {
         json()

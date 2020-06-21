@@ -25,6 +25,7 @@ kotlin {
                 api(project(":core"))
 
                 api(ktor("server-tomcat", ktorVersion))
+                api(ktor("server-cio", ktorVersion))
                 api(ktor("serialization", ktorVersion))
                 api(ktor("locations", ktorVersion))
 
