@@ -32,6 +32,7 @@ The solution works on two different type of database:
 In particular, we take advantage of Docker to run our databases on a cluster:
  - 2x Raspberry Pi v4 (Ubuntu 20.04, ARM64, 4GB RAM).
  - 1x Raspberry Pi v2b (Ubuntu 20.04, ARM32, 1GB RAM).
+ 
 Moreover, we created a MongoDB with shard and replication and implemented map reduction to retrieve data and statistics.
 
 ### Project Architecture
